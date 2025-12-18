@@ -21,7 +21,7 @@ The repository includes scripts for:
 - Conditional analysis (GCTA-COJO)
 - Colocalization and fine-mapping (COLOC, SuSiE)
 - Transcription factor network and motif activity (chromVAR)
-- Cell–cell communication analysis (CellChat)
+- Cell-cell communication analysis (CellChat)
 - Mouse validation analyses
 - Spatial transcriptomics and K-cross spatial statistics
 
@@ -54,3 +54,4 @@ Detailed accession numbers are provided in the manuscript.
 Analyses were conducted using R (v4.5.2) alongside command-line tools.
 All scripts are provided in this repository, and relevant parameters are explicitly
 specified within each script. Random seeds were set where applicable.
+
