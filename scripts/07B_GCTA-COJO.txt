@@ -1,0 +1,4 @@
+$gcta = "C:\Users\Hani\Desktop\gcta-1.95.0-Win-x86_64\gcta-1.95.0-Win-x86_64\bin\gcta64.exe"
+
+& $gcta --bfile "$refdir\UKB_SMAD3_1000G_EUR" --cojo-file "C:\Users\Hani\Desktop\FM\UKB_SMAD3_for_GCTA.tsv" --cojo-slct --cojo-p 5e-5 --out "C:\Users\Hani\Desktop\FM\UKB_SMAD3_GCTA"
+
