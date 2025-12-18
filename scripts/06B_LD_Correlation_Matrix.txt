@@ -1,0 +1,12 @@
+$plink2  = "C:\Users\Hani\Desktop\plink2_win64_20251111\plink2.exe"
+$plink = "C:\Users\Hani\Desktop\plink_win64_20250819\plink.exe"
+$refdir  = "C:\Users\Hani\Desktop\plink2_win64_20251111\INHR"
+$pfilep  = "$refdir\chr15_phase3"
+$rsFile  = "C:\Users\Hani\Desktop\FM\SMAD3_UKB_rs.tsv"
+$eurKeep = "$refdir\EUR_samples.keep"
+
+& $plink2 --zst-decompress "$pfilep.pgen.zst" "$pfilep.pgen"
+
+& $plink2 --pfile $pfilep vzs --extract $rsFile --max-alleles 2 --keep $eurKeep --keep-allele-order --make-bed --out "$refdir\UKB_SMAD3_1000G_EUR"
+
+& $plink --bfile "$refdir\UKB_SMAD3_1000G_EUR" --keep-allele-order --r square --out "$refdir\UKB_SMAD3_1000G_EUR_LD"
