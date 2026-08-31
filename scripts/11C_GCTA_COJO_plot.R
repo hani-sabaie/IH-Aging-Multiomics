@@ -3,30 +3,64 @@ library(ggplot2)
 library(patchwork)  # for combining two plots
 
 # 1) Read the CSV file for GCTA-COJO results
-gcta_cojo_data <- data.frame(
-  Chr = c(15, 15, 15, 15),
-  SNP = c("rs35874463", "rs12912045", "rs1965269", "rs3784681"),  # Two SNPs for each study
-  bp = c(67457698, 67467297, 67218945, 67472185),
-  refA = c("G", "T", "G", "C"),
-  freq = c(0.0576908, 0.209548, 0.09438, 0.2432),
-  b = c(0.0937634, -0.0611749, -0.088, -0.0638),
-  se = c(0.0196655, 0.01139, 0.0218, 0.0149),
-  p = c(1.86136e-06, 7.83337e-08, 5.4209e-05, 1.85322e-05),
-  n = c(375534, 367402, 208053, 206819),
-  freq_geno = c(0.0526839, 0.229622, 0.106362, 0.282306),
-  bJ = c(0.082597, -0.0556112, -0.0961371, -0.0690894),
-  bJ_se = c(0.0198004, 0.0114683, 0.0218718, 0.0149491),
-  pJ = c(3.02623e-05, 1.23998e-06, 1.10526e-05, 3.80729e-06),
-  LD_r = c(-0.117578, 0, -0.0807382, 0)
+# Locate repository root from this script
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_path <- sub("^--file=", "", file_arg)
+  script_dir <- dirname(normalizePath(script_path))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+
+figdir <- file.path(repo_root, "outputs", "GCTA_COJO")
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+} else {
+  repo_root <- normalizePath(".")
+}
+
+cojo_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "07_GCTA_COJO"
 )
 
-# Adding study column
-gcta_cojo_data$study <- c("UKB", "UKB", "FinnGen", "FinnGen")
+ukb_file <- file.path(
+  cojo_dir,
+  "UKB_SMAD3_GCTA_corrected.jma.cojo"
+)
+
+finngen_file <- file.path(
+  cojo_dir,
+  "Finn_SMAD3_GCTA_corrected.jma.cojo"
+)
+
+if (!file.exists(ukb_file) || !file.exists(finngen_file)) {
+  stop("Corrected GCTA-COJO .jma.cojo files not found.")
+}
+
+ukb_cojo <- read.table(
+  ukb_file,
+  header = TRUE,
+  stringsAsFactors = FALSE
+)
+ukb_cojo$study <- "UKB"
+
+finngen_cojo <- read.table(
+  finngen_file,
+  header = TRUE,
+  stringsAsFactors = FALSE
+)
+finngen_cojo$study <- "FinnGen"
+
+gcta_cojo_data <- bind_rows(
+  ukb_cojo,
+  finngen_cojo
+)
 
 # 2) Transform the data for visualization
 gcta_cojo_data <- gcta_cojo_data %>%
   mutate(
-    log_p = -log10(p),    # Calculate log10(p) for visualization
+    log_p = -log10(pJ),    # Calculate log10(p) for visualization
     rank = rank(-log_p),  # Rank based on log(p)
     highlight = case_when(
       rank == 1 ~ "top1",
@@ -45,7 +79,7 @@ p_gcta_cojo <- ggplot(gcta_cojo_data, aes(x = reorder(SNP, log_p), y = log_p, fi
   geom_hline(yintercept = -log10(5e-5), linetype = "dashed", color = "#d73027", linewidth = 0.6) +  # p = 5e-5 threshold
   annotate("label", x = 2, y = -log10(5e-5) + 0.1, label = "p = 5e-5", hjust = 0.5, vjust = 0, size = 3, color = "#5b0000") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
-  labs(title = "GCTA-COJO Results for SMAD3", x = "SNP", y = "-log10(p)") +
+  labs(title = "GCTA-COJO Results for SMAD3", x = "SNP", y = expression(-log[10](P[J]))) +
   scale_x_discrete(position = "bottom") +
   coord_cartesian(ylim = c(0, max(gcta_cojo_data$log_p) + 0.2), clip = "off") +
   theme_classic() +
@@ -58,4 +92,8 @@ p_gcta_cojo <- ggplot(gcta_cojo_data, aes(x = reorder(SNP, log_p), y = log_p, fi
   )
 
 # 4) Save the plot
-ggsave("SMAD3_GCTA_COJO_results_with_tissue_and_study_threshold_5e-5.png", p_gcta_cojo, width = 6, height = 4, dpi = 300)
+ggsave(
+  file.path(figdir, "SMAD3_GCTA_COJO_results_with_tissue_and_study_threshold_5e-5.png"),
+  p_gcta_cojo,
+  width = 6, height = 4, dpi = 300
+)

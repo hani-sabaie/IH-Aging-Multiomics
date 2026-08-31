@@ -20,10 +20,44 @@ library(ggpubr)
 library(tibble)
 library(tidyr)
 
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
 # ===== Helpers =====
-figdir <- "results_TF_mouse/Raincloud"
+outdir <- file.path(repo_root, "outputs")
+resdir <- file.path(repo_root, "processed_results", "13_mouse_validation")
+figdir <- file.path(outdir, "mouse_chromVAR", "Raincloud")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(resdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+
+mouse_obj_file <- Sys.getenv(
+  "MOUSE_SEURAT_RDS",
+  unset = file.path(
+    repo_root,
+    "data",
+    "GSE288662",
+    "Processed_Seurat_Object",
+    "GSE288662_Processed_Seurat_Object.rds"
+  )
+)
+
+if (!file.exists(mouse_obj_file)) {
+  stop("Mouse Seurat object not found: ", mouse_obj_file)
+}
+
+chromvar_obj_file <- file.path(outdir, "mouse_chromVAR_obj.rds")
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
-  if (!dir.exists(figdir)) dir.create(figdir, recursive = TRUE)
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
   } else {
@@ -37,7 +71,7 @@ save_gg <- function(p, filename, w=7, h=5, dpi=300){
 # ============================
 # Load mouse object
 # ============================
-obj <- readRDS("../data/GSE288662/Processed_Seurat_Object/GSE288662_Processed_Seurat_Object.rds")
+obj <- readRDS(mouse_obj_file)
 
 # Harmonize metadata to reuse logic
 obj$skeletal_muscle <- obj$type   
@@ -57,7 +91,7 @@ obj <- FindTopFeatures(obj, min.cutoff = "q0.7")
 # ============================
 # Add motifs Run chromVAR
 # ============================
-motif_obj <- tryCatch(Motifs(obj_mouse[["ATAC"]]), error=function(e) NULL)
+motif_obj <- tryCatch(Motifs(obj[["ATAC"]]), error=function(e) NULL)
 if (is.null(motif_obj)) {
   db <- JASPAR2024()
   sq <- RSQLite::dbConnect(RSQLite::SQLite(), db(db))
@@ -71,12 +105,12 @@ obj <- RunChromVAR(
   genome = BSgenome.Mmusculus.UCSC.mm10
 )
 
-saveRDS(obj, "../outputs/mouse_chromVAR_obj.rds")
+saveRDS(obj, chromvar_obj_file)
 
 # ============================
 # Motif IDs for TFs of interest (mouse)
 # ============================
-obj <- readRDS("../data/GSE288662/Processed_Seurat_Object/GSE288662_Processed_Seurat_Object.rds")
+obj <- readRDS(chromvar_obj_file)
 DefaultAssay(obj) <- "chromvar"
 
 motif_obj <- Motifs(obj[["ATAC"]])
@@ -113,7 +147,7 @@ get_chromvar_feature <- function(seu, motif_id) {
 # ============================
 # Raincloud
 # ============================
-plot_raincloud <- function(df, feat, cf, tf_name, save_dir="results_TF_mouse/Raincloud") {
+plot_raincloud <- function(df, feat, cf, tf_name, save_dir = figdir) {
   
   if (is.na(feat)) {
     warning("Skipping ", tf_name, " in ", cf, " : feature is NA")
@@ -220,7 +254,7 @@ for (cf in fap_levels) {
   )
 }
 
-saveRDS(results_list, "results_TF_mouse/Fibro_mouse_chromVAR_results.rds")
+saveRDS(results_list, file.path(resdir, "Fibro_mouse_chromVAR_results.rds"))
 
 # ============================
 # Master facet figure (mouse: FAP-like × 4 motif)
@@ -261,7 +295,7 @@ p_facet <- ggplot(df_plot, aes(x=condition, y=value, fill=condition)) +
   )
 
 ggsave(
-  "results_TF_mouse/Raincloud/Raincloud_FACET_mouse_fibro_all_TFs.png",
+  file.path(figdir, "Raincloud_FACET_mouse_fibro_all_TFs.png"),
   p_facet,
   width=15, height=12, dpi=300, bg="white"
 )

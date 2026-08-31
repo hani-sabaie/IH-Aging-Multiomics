@@ -1,0 +1,2 @@
+"LD_reference"	"SNP"	"variable_prob"	"cs"
+"1"	"1000G"	"rs35874463"	0.933228742053833	2

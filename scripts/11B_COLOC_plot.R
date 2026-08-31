@@ -2,20 +2,34 @@ library(dplyr)
 library(ggplot2)
 library(patchwork)  # for combining two plots
 
+# Locate repository root from this script
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_path <- sub("^--file=", "", file_arg)
+  script_dir <- dirname(normalizePath(script_path))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+
+figdir <- file.path(repo_root, "outputs", "colocalization")
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+} else {
+  repo_root <- normalizePath(".")
+}
+
 # 1) Read the CSV file for coloc results
-coloc_data <- data.frame(
-  gene = c("SMAD3", "SMAD3"),
-  nsnps = c(155, 159),
-  pph0 = c(7.32E-07, 3.37E-05),
-  pph1 = c(3.66E-05, 8.08E-05),
-  pph2 = c(0.001351143, 0.053496489),
-  pph3 = c(0.066666453, 0.127406704),
-  PP.H4 = c(0.931945075, 0.818982271),  # Changed name to PP.H4
-  top_snp = c("rs10152595", "rs11315136"),
-  top_snp_pph4 = c(0.219805296, 0.056452099),
-  study = c("UKB", "FinnGen"),
-  tissue = c("Adipose Subcutaneous", "Adipose Subcutaneous")  # Added tissue column
-)
+coloc_data <- read.csv(
+  file.path(
+    repo_root,
+    "processed_results",
+    "08_colocalization",
+    "COLOC_all_studies_sig.csv"
+  )
+) %>%
+  filter(gene == "SMAD3") %>%
+  rename(
+    PP.H4 = pph4
+  )
 
 # 2) Transform the data for visualization
 coloc_data <- coloc_data %>%
@@ -51,4 +65,8 @@ p_coloc <- ggplot(coloc_data, aes(x = reorder(top_snp, PP.H4), y = PP.H4, fill =
   )
 
 # 4) Save the plot
-ggsave("SMAD3_coloc_results_with_tissue_and_study_threshold_0.75.png", p_coloc, width = 6, height = 4, dpi = 300)
+ggsave(
+  file.path(figdir, "SMAD3_coloc_results_with_tissue_and_study_threshold_0.75.png"),
+  p_coloc,
+  width = 6, height = 4, dpi = 300
+)

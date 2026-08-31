@@ -15,7 +15,12 @@ library(dplyr)
 set.seed(1234)
 
 # ===== Helpers =====
-figdir <- "../outputs/sc/figs"
+outdir <- "../outputs"
+figdir <- file.path(outdir, "sc", "figs")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")

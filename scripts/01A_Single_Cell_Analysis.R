@@ -35,8 +35,47 @@ library(cluster)
 # ===== set seed =====
 set.seed(1234)
 
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+rna_atac_dir <- Sys.getenv(
+  "GSE268953_RNA_ATAC_DIR",
+  unset = file.path(repo_root, "data", "GSE268953", "RNA_ATAC")
+)
+
+fragment_dir <- Sys.getenv(
+  "GSE268953_FRAGMENTS_DIR",
+  unset = file.path(repo_root, "data", "GSE268953", "Fragments")
+)
+
 # ===== Helpers =====
-figdir <- "../outputs/sc/figs"
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "sc", "figs")
+qc_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "01_QC"
+)
+
+de_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "02_differential_expression"
+)
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(qc_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(de_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -57,8 +96,8 @@ wtxt <- function(v, path) write.table(v, path, quote = FALSE, row.names = FALSE,
 # ========================
 # Importing Data
 # ========================
-# List sample folders under ../data
-files <- list.dirs(path = "../data/GSE268953/RNA_ATAC/", recursive = F, full.names = TRUE)
+# List sample folders under the configured RNA/ATAC input directory
+files <- list.dirs(path = rna_atac_dir, recursive = FALSE, full.names = TRUE)
 
 # Keep only folders that contain the full 10x trio
 has_mtx  <- file.exists(file.path(files, "matrix.mtx.gz"))
@@ -131,7 +170,7 @@ rm(input_list)
 # ========================
 # Fragments indexing
 # ========================
-frag_dir   <- "../data/GSE268953/Fragments"
+frag_dir <- fragment_dir
 frag_files <- setNames(file.path(frag_dir, names(obj_list), "atac_fragments.tsv.gz"),
                        names(obj_list))
 
@@ -282,14 +321,14 @@ save_gg(obj@meta.data %>%
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/decont_merged_obj.rds")
+saveRDS(obj,file.path(outdir, "decont_merged_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_obj.rds"))
 
 # Examine the object
 glimpse(obj)
@@ -320,17 +359,12 @@ obj <- TSSEnrichment(object = obj, fast = FALSE)
 
 # FRiP (fraction of reads in peaks)
 sample_names <- c(paste0("Aged_", 1:5), paste0("Young_", 1:5))
-fragments_files <- c(
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Aged_1/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Aged_2/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Aged_3/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Aged_4/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Aged_5/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Young_1/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Young_2/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Young_3/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Young_4/atac_fragments.tsv.gz",
-  "C:/Users/Hani/Desktop/Hernia/data/GSE268953/Fragments/Young_5/atac_fragments.tsv.gz"
+
+
+fragments_files <- file.path(
+  fragment_dir,
+  sample_names,
+  "atac_fragments.tsv.gz"
 )
 raw_from_merged <- function(x) sub("^.*_", "", x)
 obj@meta.data$fragments_total <- NA_real_
@@ -625,14 +659,14 @@ save_gg(p26, "FeatureScatter_RNA_Mito_Ribo_post_filt.png", w=12, h=5)
 # ========================
 # Save the object
 # ========================
-saveRDS(obj_filt,"../outputs/decont_merged_filt_obj.rds")
+saveRDS(obj_filt,file.path(outdir, "decont_merged_filt_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_obj.rds"))
 
 # ========================
 # Per-sample scDblFinder 
@@ -678,7 +712,7 @@ doublets_summary <- obj@meta.data %>%
   mutate(percent = paste0(round(100 * total_count/countT, 2),'%')) %>%
   dplyr::select(-countT)
 doublets_summary
-write.table(doublets_summary, file = file.path("../outputs", paste0('scDblFinder_doublets_summary.txt')), quote = FALSE, row.names = FALSE, sep = '\t')
+write.table(doublets_summary, file = file.path(qc_dir, "scDblFinder_doublets_summary.txt"), quote = FALSE, row.names = FALSE, sep = '\t')
 
 # ===== Remove doublets =====
 obj_nodoub <- subset(obj, scDblFinder.class == "singlet")
@@ -687,14 +721,14 @@ obj_nodoub <- subset(obj, scDblFinder.class == "singlet")
 # Save the object
 # ========================
 obj_nodoub[["RNA"]] <- split(obj_nodoub[["RNA"]], f = obj_nodoub$sample)
-saveRDS(obj_nodoub,"../outputs/decont_merged_filt_nodoub_obj.rds")
+saveRDS(obj_nodoub,file.path(outdir, "decont_merged_filt_nodoub_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_obj.rds"))
 
 # ========================
 # Normalization, find variable features, and scale
@@ -771,14 +805,14 @@ save_gg(DimPlot(obj, reduction = "pca", group.by = "Phase"),
 cc_meta <- obj@meta.data %>%
   dplyr::select(S.Score, G2M.Score, Phase) %>%
   tibble::rownames_to_column("cell")
-saveRDS(cc_meta, "../outputs/cellcycle_meta.rds")
+saveRDS(cc_meta, file.path(outdir, "cellcycle_meta.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_obj.rds"))
 
 # ========================
 # Explanatory Variables
@@ -850,8 +884,8 @@ save_gg(ggplot(df_pcqc, aes(Variable, PC, fill = R2)) +
 # ========================
 # Load the object and metadata
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_obj.rds")
-cc_meta <- readRDS("../outputs/cellcycle_meta.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_obj.rds"))
+cc_meta <- readRDS(file.path(outdir, "cellcycle_meta.rds"))
 cc_meta <- cc_meta[cc_meta$cell %in% colnames(obj), ]
 rownames(cc_meta) <- cc_meta$cell
 cc_meta$cell <- NULL
@@ -873,14 +907,14 @@ DefaultAssay(object = obj)
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/decont_merged_filt_nodoub_cc_sct_obj.rds")
+saveRDS(obj,file.path(outdir, "decont_merged_filt_nodoub_cc_sct_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_cc_sct_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_cc_sct_obj.rds"))
 
 # ========================
 # Linear dimension reduction (RNA analysis)
@@ -932,14 +966,14 @@ save_gg(dc, "DepthCor_LSI.png", w = 8, h = 5)
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/decont_merged_filt_nodoub_cc_sct_reduc_obj.rds")
+saveRDS(obj,file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_cc_sct_reduc_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_obj.rds"))
 
 # ========================
 # SCT integration
@@ -1166,14 +1200,14 @@ obj[["RNA"]] <- JoinLayers(obj[["RNA"]])
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_obj.rds")
+saveRDS(obj,file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_obj.rds"))
 
 # Reviewing the data
 table(obj$sample)
@@ -1355,14 +1389,14 @@ save_gg(f, "Clusters_with_annotation.png", w=11, h=5)
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds")
+saveRDS(obj,file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"))
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds")
+obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"))
 # obj <- obj %>% subset(cell_type == 'FAPs')
 
 # ========================
@@ -1468,7 +1502,7 @@ bulk_de <- bind_rows(res_list) %>%
 # Significant DE genes 
 bulk_de_sig <- bulk_de %>% filter(p_val_adj < 0.05 & avg_log2FC >= 1)
 
-wcsv(bulk_de_sig, file.path("results_sc", "bulk_de_sig.csv"))
-wcsv(bulk_de_sig, file.path("results_sc", "bulk_de_sig_faps.csv"))
+wcsv(bulk_de_sig, file.path(de_dir, "bulk_de_sig.csv"))
+wcsv(bulk_de_sig, file.path(de_dir, "bulk_de_sig_faps.csv"))
 
 

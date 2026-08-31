@@ -1,0 +1,90 @@
+Command-line software environment
+=================================
+
+The following external command-line tools were used in the analyses.
+Executable locations are user-specific and are intentionally not hard-coded
+in this repository.
+
+1. PLINK 2
+----------
+Version:
+  PLINK v2.0.0-a.7 64-bit (11 Nov 2025)
+
+Executable name used by the reproducible scripts:
+  plink2
+
+Primary use:
+  - decompression/conversion of 1000 Genomes reference genotype files
+  - SNP extraction
+  - construction of locus-specific European LD reference datasets
+
+Relevant script:
+  scripts/06B_LD_Correlation_Matrix.ps1
+
+
+2. PLINK 1.9
+------------
+Version:
+  PLINK v1.9.0-b.7.11 64-bit (19 Aug 2025)
+
+Executable name used by the reproducible scripts:
+  plink
+
+Primary use:
+  - calculation of pairwise/square LD correlation matrices
+
+Relevant script:
+  scripts/06B_LD_Correlation_Matrix.ps1
+
+
+3. GCTA
+-------
+Version:
+  GCTA v1.95.0 Windows
+
+Executable name used by the reproducible scripts:
+  gcta64
+
+Primary use:
+  - GCTA-COJO stepwise conditional and joint association analysis
+
+Relevant script:
+  scripts/07B_GCTA-COJO.ps1
+
+Principal COJO settings used in this study:
+  --cojo-slct
+  --cojo-p 5e-5
+
+
+4. SMR
+------
+Version:
+  SMR v1.3.1
+
+Default executable name expected by the PowerShell workflow:
+  smr-1.3.1-win.exe
+
+The executable can instead be supplied through:
+  SMR_EXE
+
+Primary use:
+  - summary-data-based Mendelian randomization (SMR)
+  - HEIDI heterogeneity testing
+
+Relevant script:
+  scripts/04_SMR_and_HEIDI_Analysis.ps1
+
+
+Reproducibility notes
+---------------------
+The exact installation paths of these tools are machine-specific and are not
+required to match the original analysis environment.
+
+Users should either:
+  - place the required executables on PATH, or
+  - configure the executable location as supported by the corresponding
+    analysis script.
+
+R and R-package versions are recorded separately in:
+  environment/R_session_info.txt
+  environment/R_package_versions.csv

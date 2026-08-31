@@ -36,7 +36,46 @@ library(cluster)
 set.seed(1234)
 
 # ===== Helpers =====
-figdir <- "../outputs/mouse"
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+outdir <- file.path(repo_root, "outputs")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "13_mouse_validation"
+)
+
+mouse_obj_file <- Sys.getenv(
+  "MOUSE_SEURAT_RDS",
+  unset = file.path(
+    repo_root,
+    "data",
+    "GSE288662",
+    "Processed_Seurat_Object",
+    "GSE288662_Processed_Seurat_Object.rds"
+  )
+)
+
+if (!file.exists(mouse_obj_file)) {
+  stop(
+    "Mouse Seurat object not found: ", mouse_obj_file,
+    "\nSet MOUSE_SEURAT_RDS to the local GSE288662 processed Seurat object."
+  )
+}
+figdir <- file.path(outdir, "mouse")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -57,7 +96,7 @@ wtxt <- function(v, path) write.table(v, path, quote = FALSE, row.names = FALSE,
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../data/GSE288662/Processed_Seurat_Object/GSE288662_Processed_Seurat_Object.rds")
+obj <- readRDS(mouse_obj_file)
 
 # ========================
 # Quality Control
@@ -125,7 +164,7 @@ save_gg(p20, "FeatureScatter_RNA_Metrics_post_filt.png", w=8, h=5)
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../data/GSE288662/Processed_Seurat_Object/GSE288662_Processed_Seurat_Object.rds")
+obj <- readRDS(mouse_obj_file)
 
 DefaultAssay(obj) <- "RNA"
 
@@ -169,7 +208,7 @@ save_gg(plotExplanatoryVariables(sce, exprs_values = "logcounts_raw",
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../data/GSE288662/Processed_Seurat_Object/GSE288662_Processed_Seurat_Object.rds")
+obj <- readRDS(mouse_obj_file)
 
 # ========================
 # Annotation
@@ -225,7 +264,7 @@ save_gg(f, "Clusters_with_annotation.png", w=11, h=5)
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../data/GSE288662/Processed_Seurat_Object/GSE288662_Processed_Seurat_Object.rds")
+obj <- readRDS(mouse_obj_file)
 # obj1 <- obj %>% subset(type == 'FAPs')
 
 # ========================
@@ -411,7 +450,7 @@ bulk_de_sig <- bulk_de %>%
 # Save results
 # ========================
 # All DE (all contrasts, all cell types)
-wcsv(bulk_de, "../outputs/bulk_de_all_contrasts_mouse.csv")
+wcsv(bulk_de, file.path(processed_dir, "bulk_de_all_contrasts_mouse.csv"))
 
 # Significant subset
-wcsv(bulk_de_sig, "../outputs/bulk_de_sig_all_contrasts_mouse.csv")
+wcsv(bulk_de_sig, file.path(processed_dir, "bulk_de_sig_all_contrasts_mouse.csv"))

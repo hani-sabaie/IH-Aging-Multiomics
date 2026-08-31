@@ -17,7 +17,38 @@ library(spatstat.explore) # K-functions
 
 # ===== Paths and gene sets =====
 # Base directory that contains GSM* folders
-base_dir <- "C:/Users/Hani/Desktop/Hernia/data/GSE288662/Spatial"
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+base_dir <- Sys.getenv(
+  "FIG21_SPATIAL_DIR",
+  unset = file.path(repo_root, "data", "GSE288663", "Spatial")
+)
+
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "spatial")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "14_spatial"
+)
+
+if (!dir.exists(base_dir)) {
+  stop(
+    "Spatial input directory not found: ", base_dir,
+    "\nSet FIG21_SPATIAL_DIR to the local GSE288663 Spatial directory."
+  )
+}
+
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
 
 # 4 samples: 2 Veh + 2 EP
 sample_info <- data.frame(
@@ -116,7 +147,7 @@ tx_all$group <- factor(tx_all$group,
 count_table <- tx_all %>%
   count(sample, group) %>%
   tidyr::pivot_wider(names_from = group, values_from = n, values_fill = 0)
-write.csv(count_table, "Transcript_counts_Smad3_network_by_sample.csv",
+write.csv(count_table, file.path(processed_dir, "Transcript_counts_Smad3_network_by_sample.csv"),
           row.names = FALSE)
 
 # Interpretation:
@@ -218,7 +249,7 @@ p_points_grid <- (plots_per_sample[["1450Veh"]]$points |
   (plots_per_sample[["1460EP"]]$points  |
      plots_per_sample[["1461EP"]]$points)
 
-ggsave("Xenium_transcripts_Smad3_points_4samples.png",
+ggsave(file.path(figdir, "Xenium_transcripts_Smad3_points_4samples.png"),
        p_points_grid, width = 12, height = 8, dpi = 300)
 
 # Arrange density maps in 2×2
@@ -227,7 +258,7 @@ p_density_grid <- (plots_per_sample[["1450Veh"]]$density_pos |
   (plots_per_sample[["1460EP"]]$density_pos  |
      plots_per_sample[["1461EP"]]$density_pos)
 
-ggsave("Xenium_transcripts_Smad3Pos_density_4samples.png",
+ggsave(file.path(figdir, "Xenium_transcripts_Smad3Pos_density_4samples.png"),
        p_density_grid, width = 12, height = 8, dpi = 300)
 
 # ===== Cross-K function: Smad3 vs Pos targets (each sample) =====
@@ -262,14 +293,19 @@ for (s in sample_info$sample) {
   
   K_cross_s <- Kcross(pp_s, i = "Smad3", j = "PosTarget")
   
-  png(paste0("Kcross_Smad3_PosTargets_", s, ".png"),
+  png(file.path(figdir, paste0("Kcross_Smad3_PosTargets_", s, ".png")),
       width = 900, height = 700, res = 300)
   plot(K_cross_s,
        main = paste0("Kcross(Smad3, Pos targets) — ", s))
   dev.off()
   
-  saveRDS(K_cross_s,
-          file = paste0("Kcross_Smad3_PosTargets_", s, ".rds"))
+  saveRDS(
+    K_cross_s,
+    file = file.path(
+      processed_dir,
+      paste0("Kcross_Smad3_PosTargets_", s, ".rds")
+    )
+  )
   
   # Interpretation:
   # If Kcross(r) > theoretical pi*r^2 curve across distances r,

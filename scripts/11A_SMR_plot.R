@@ -2,9 +2,29 @@ library(dplyr)
 library(ggplot2)
 library(patchwork)  # for combining two plots
 
+# Locate repository root from this script
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_path <- sub("^--file=", "", file_arg)
+  script_dir <- dirname(normalizePath(script_path))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+figdir <- file.path(repo_root, "outputs", "SMR_HEIDI")
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+
 # 1) Read the CSV file
 smr_all <- read.csv(
-  "C:\\Users\\Hani\\Desktop\\smr-1.3.1-win-x86_64\\SMR_IHR_Local\\all_results\\SMR_all_studies_all_tissues.csv",  # Adjust your path here
+  file.path(
+    repo_root,
+    "processed_results",
+    "06_SMR_HEIDI",
+    "SMR_all_studies_all_tissues.csv"
+  ),
   header = TRUE
 )
 
@@ -125,11 +145,12 @@ for (this_study in unique(smr_all$study)) {
                size = 3, linewidth = 0.25,
                fill = "white", color = "#2b3f73") +
     scale_fill_manual(values = fill_cols, guide = "none") +
-    scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
     labs(x = NULL, y = NULL) +
     scale_x_discrete(position = "top") +  # Keep x-axis but remove labels
     coord_cartesian(ylim = c(ymin_heidi, ymax_heidi), clip = "off") +
-    scale_y_reverse() +  # Flip HEIDI axis here
+    scale_y_reverse(
+  expand = expansion(mult = c(0, 0.05))
+) +  # Flip HEIDI axis here
     theme_classic() +
     theme(
       axis.text.x.top = element_blank(),  # Remove x-axis labels from p2
@@ -143,6 +164,12 @@ for (this_study in unique(smr_all$study)) {
   
   # 7) Save per study
   out_name <- paste0(gene_of_interest, "_", this_study, "_SMR_HEIDI.png")
-  ggsave(out_name, final_plot, width = 6, height = 5, dpi = 300)
+  ggsave(
+  file.path(figdir, out_name),
+  final_plot,
+  width = 6,
+  height = 5,
+  dpi = 300
+)
 }
 

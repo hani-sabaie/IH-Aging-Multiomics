@@ -14,9 +14,9 @@ library(purrr)
 # ============================================================================ #
 # ===== Inputs =====
 # Paths
-gwas_file <- "C:/Users/Hani/Desktop/FM/Finn_SMAD3_250kb.txt"
-bim_file <- "C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.bim"
-ld_file <- "C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR_LD.ld"
+gwas_file <- "./Finn_SMAD3_250kb.txt"
+bim_file <- "../data/1000Genomes/Finn_SMAD3_1000G_EUR.bim"
+ld_file <- "../data/1000Genomes/Finn_SMAD3_1000G_EUR_LD.ld"
 
 # Case/control numbers
 ncase <- 17096

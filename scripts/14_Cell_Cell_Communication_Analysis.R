@@ -13,8 +13,39 @@ library(CellChat)
 # ===== set seed =====
 set.seed(1234)
 
-# ===== Helpers =====
-figdir <- "../outputs/sc/figs"
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "CellChat")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "12_CellChat"
+)
+
+input_obj_file <- file.path(
+  outdir,
+  "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
+)
+
+cellchat_file <- file.path(
+  processed_dir,
+  "cellchat_merged.rds"
+)
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -29,7 +60,7 @@ save_gg <- function(p, filename, w=7, h=5, dpi=300){
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds")
+obj <- readRDS(input_obj_file)
 
 # ========================
 # Cell-cell communication analysis
@@ -278,4 +309,4 @@ save_gg(
   w = 7, h = 5
 )
 
-saveRDS(cellchat_merged, file = "../outputs/cellchat_merged.rds")
+saveRDS(cellchat_merged, file = cellchat_file)

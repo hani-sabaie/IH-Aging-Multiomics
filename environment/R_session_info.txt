@@ -1,0 +1,38 @@
+Generated from the analysis environment used for manuscript revision.
+
+R version:
+R version 4.5.2 (2025-10-31 ucrt)
+
+Platform:
+x86_64-w64-mingw32
+
+Operating system:
+      sysname       release       version       machine
+    "Windows"      "10 x64" "build 19045"      "x86-64"
+
+Locale:
+[1] "LC_COLLATE=English_United States.utf8;LC_CTYPE=en_US.UTF-8;LC_MONETARY=English_United States.utf8;LC_NUMERIC=C;LC_TIME=English_United States.utf8"
+
+Session info:
+R version 4.5.2 (2025-10-31 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 10 x64 (build 19045)
+
+Matrix products: default
+  LAPACK version 3.12.1
+
+locale:
+[1] LC_COLLATE=English_United States.utf8
+[2] LC_CTYPE=en_US.UTF-8
+[3] LC_MONETARY=English_United States.utf8
+[4] LC_NUMERIC=C
+[5] LC_TIME=English_United States.utf8
+
+time zone: Asia/Tehran
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base
+
+loaded via a namespace (and not attached):
+[1] compiler_4.5.2 tools_4.5.2

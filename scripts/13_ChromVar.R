@@ -20,8 +20,39 @@ library(ggpubr)
 library(tibble)
 library(ggplot2)
 
-# ===== Helpers =====
-figdir <- "results_TF/Raincloud"
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+checkpoint_dir <- file.path(repo_root, "outputs")
+figdir <- file.path(checkpoint_dir, "chromVAR", "Raincloud")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "11_chromVAR"
+)
+
+input_obj_file <- file.path(
+  checkpoint_dir,
+  "hdWGCNA_TFNet_DEReg_L2G_obj.rds"
+)
+
+chromvar_obj_file <- file.path(
+  checkpoint_dir,
+  "hdWGCNA_TFNet_DEReg_L2G_chromVAR_obj.rds"
+)
+
+dir.create(checkpoint_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -35,7 +66,7 @@ save_gg <- function(p, filename, w=7, h=5, dpi=300){
 
 # ===== chromVAR motif activity =====
 # Load object with SCT + ATAC + TFNet
-obj <- readRDS("../outputs/hdWGCNA_TFNet_DEReg_L2G_obj.rds")
+obj <- readRDS(input_obj_file)
 
 # Use ATAC assay
 DefaultAssay(obj) <- "ATAC"
@@ -66,7 +97,7 @@ obj <- RunChromVAR(
   genome = BSgenome.Hsapiens.UCSC.hg38,
 )
 
-saveRDS(obj, "../outputs/hdWGCNA_TFNet_DEReg_L2G_chromVAR_obj.rds")
+saveRDS(obj, chromvar_obj_file)
 
 DefaultAssay(obj) <- "chromvar"
 
@@ -100,7 +131,7 @@ get_chromvar_feature <- function(seu, motif_id) {
 }
 
 # ===== Raincloud function =====
-plot_raincloud <- function(df, feat, cf, tf_name, save_dir="results_TF/Raincloud") {
+plot_raincloud <- function(df, feat, cf, tf_name, save_dir = figdir) {
   
   if (is.na(feat)) {
     warning("Skipping ", tf_name, " in ", cf, " : feature is NA")
@@ -219,7 +250,7 @@ for (cf in fap_levels) {
     tibble::rownames_to_column("peak_region") %>%
     left_join(peak_links_df, by = "peak_region")
   
-  out_csv <- paste0("results_TF/DA_peaks_linked_to_SMAD3_", cf, "_Aged_vs_Young.csv")
+  out_csv <- file.path(processed_dir, paste0("DA_peaks_linked_to_SMAD3_", cf, "_Aged_vs_Young.csv"))
   write.csv(da_peaks_smad3, out_csv, row.names = FALSE)
   
   results_list[[cf]] <- list(
@@ -233,7 +264,7 @@ for (cf in fap_levels) {
   )
 }
 
-saveRDS(results_list, "results_TF/FAP1_4_chromVAR_DA_results.rds")
+saveRDS(results_list, file.path(processed_dir, "FAP1_4_chromVAR_DA_results.rds"))
 
 # ===== Master facet figure (FAP1–4 × 4 motif) =====
 df_all <- bind_rows(all_plots_for_facet)
@@ -272,7 +303,7 @@ p_facet <- ggplot(df_plot, aes(x=condition, y=value, fill=condition)) +
   )
 
 ggsave(
-  "results_TF/Raincloud/Raincloud_FACET_FAP1_4_all_TFs.png",
+  file.path(figdir, "Raincloud_FACET_FAP1_4_all_TFs.png"),
   p_facet,
   width=15, height=12, dpi=300, bg="white"
 )
