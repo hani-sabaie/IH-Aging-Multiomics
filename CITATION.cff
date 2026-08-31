@@ -2,6 +2,8 @@ cff-version: 1.2.0
 message: "If you use this code or processed resource collection, please cite this repository and the associated study."
 title: "IH-Aging-Multiomics"
 type: software
+version: 1.0.0
+date-released: 2026-08-31
 
 authors:
   - given-names: "Amir Hesam"
