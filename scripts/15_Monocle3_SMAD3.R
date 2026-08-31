@@ -14,8 +14,31 @@ library(dplyr)
 # ===== set seed =====
 set.seed(1234)
 
-# ===== Helpers =====
-figdir <- "../outputs/sc/figs"
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "trajectory")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "04_trajectory"
+)
+
+hdwgcna_file <- file.path(outdir, "hdWGCNA_obj.rds")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -32,7 +55,7 @@ wcsv <- function(x, path) write.csv(x, path, row.names = TRUE)
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_obj.rds")
+obj <- readRDS(hdwgcna_file)
 
 # Build Monocle3 CDS from Seurat
 # Expression matrix from SCT assay 
@@ -119,7 +142,7 @@ gt_young <- graph_test(
 )
 
 smad3_gt_young <- gt_young[gt_young$gene_short_name == "SMAD3", ]
-wcsv(smad3_gt_young, "../outputs/sc/smad3_moran_test.csv")
+wcsv(smad3_gt_young, file.path(processed_dir, "smad3_moran_test.csv"))
 # Look at morans_I and q_value:
 # q_value < 0.05 => SMAD3 significantly varies along the trajectory.
 
@@ -192,6 +215,6 @@ cond_effect <- coef_tab %>%
 cond_effect_clean <- cond_effect |>
   dplyr::select(-model, -model_summary)
 
-wcsv(cond_effect_clean, "../outputs/sc/condition_effect_SMAD3_trajectory.csv")
+wcsv(cond_effect_clean, file.path(processed_dir, "condition_effect_SMAD3_trajectory.csv"))
 # If q_value for condition term < 0.05:
 # => SMAD3 is significantly different between Young and Aged along the trajectory.

@@ -2,13 +2,41 @@
 rm(list = ls(all.names = TRUE))
 gc()
 
-# ===== Loading relevant libraries =====library(data.table)
+# ===== Loading relevant libraries =====
+library(data.table)
 library(dplyr)
 library(stringr)
 
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+ukb_dir <- file.path(repo_root, "data", "GWAS", "UKB")
+finngen_dir <- file.path(repo_root, "data", "GWAS", "FinnGen")
+
+dir.create(ukb_dir, recursive = TRUE, showWarnings = FALSE)
+dir.create(finngen_dir, recursive = TRUE, showWarnings = FALSE)
+
+ukb_input <- Sys.getenv(
+  "UKB_GWAS_RAW",
+  unset = file.path(ukb_dir, "shortfinalINGallMAFge05padjplusxxy.txt")
+)
+
+finngen_input <- Sys.getenv(
+  "FINNGEN_GWAS_RAW",
+  unset = file.path(finngen_dir, "finn-b-K11_HERING.vcf.gz")
+)
+
 # ============================================================================ #
 # ===== UKB dataset =====
-gwas <- fread("shortfinalINGallMAFge05padjplusxxy.txt")
+gwas <- fread(ukb_input)
 
 lambda_gc <- 1.084
 N_gwas <- 371810   
@@ -35,16 +63,28 @@ gwas_xqtl <- gwas %>%
 head(gwas)
 head(gwas_xqtl)
 
-# write.table(gwas_xqtl, "UKB_gwas_for_xqtlbiolinks.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(
+  gwas_xqtl,
+  file.path(ukb_dir, "UKB_gwas_for_xqtlbiolinks.txt"),
+  quote = FALSE,
+  sep = "\t",
+  row.names = FALSE
+)
 
 gwas_smr <- gwas_xqtl %>%
   select(SNP, A1, A2, freq, b, se, p, n)
 
-write.table(gwas_smr, "UKB_gwas_for_smr.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(
+  gwas_smr,
+  file.path(ukb_dir, "UKB_gwas_for_smr.txt"),
+  quote = FALSE,
+  sep = "\t",
+  row.names = FALSE
+)
 
 # ============================================================================ #
 # ===== FinnGen dataset =====
-gwas <- fread("finn-b-K11_HERING.vcf.gz", skip = "#CHROM")
+gwas <- fread(finngen_input, skip = "#CHROM")
 dt <- as.data.table(gwas)
 ph <- setdiff(colnames(gwas),
                      c("#CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO","FORMAT"))
@@ -76,9 +116,19 @@ gwas_xqtl <- dt[!is.na(ES) & !is.na(SE) & !is.na(P),
 head(dt)
 head(gwas_xqtl)
 
-# fwrite(gwas_xqtl, "Finn_gwas_for_xqtlbiolinks.txt", sep = "\t")
+fwrite(
+  gwas_xqtl,
+  file.path(finngen_dir, "Finn_gwas_for_xqtlbiolinks.txt"),
+  sep = "\t"
+)
 
 gwas_smr <- gwas_xqtl %>%
   select(SNP, A1, A2, freq, b, se, p, n)
 
-write.table(gwas_smr, "Finn_gwas_for_smr.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+write.table(
+  gwas_smr,
+  file.path(finngen_dir, "Finn_gwas_for_smr.txt"),
+  quote = FALSE,
+  sep = "\t",
+  row.names = FALSE
+)

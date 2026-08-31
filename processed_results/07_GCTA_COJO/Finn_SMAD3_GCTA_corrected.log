@@ -1,0 +1,45 @@
+*******************************************************************
+* Genome-wide Complex Trait Analysis (GCTA)
+* version v1.95.0 Windows
+* (C) 2010-present, Yang Lab, Westlake University
+* Please report bugs to Jian Yang <jian.yang@westlake.edu.cn>
+*******************************************************************
+Analysis started at 01:15:57 Iran Standard Time on Sun Aug 30 2026.
+Hostname: DESKTOP-56M1GM4
+
+Accepted options:
+--bfile C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR
+--cojo-file C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_for_GCTA_corrected.tsv
+--cojo-slct
+--cojo-p 5e-05
+--out C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_GCTA_corrected
+
+
+Reading PLINK FAM file from [C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.fam].
+503 individuals to be included from [C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.fam].
+Reading PLINK BIM file from [C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.bim].
+2724 SNPs to be included from [C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.bim].
+Warning: Duplicated SNP ID "rs145272336" has been changed to "rs145272336_245"
+.Reading PLINK BED file from [C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.bed] in SNP-major format ...
+Genotype data for 503 individuals and 2724 SNPs to be included from [C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/Finn_SMAD3_1000G_EUR.bed].
+
+Reading GWAS summary-level statistics from [C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_for_GCTA_corrected.tsv] ...
+GWAS summary statistics of 3376 SNPs read from [C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_for_GCTA_corrected.tsv].
+Phenotypic variance estimated from summary statistics of all 3376 SNPs: 16.882 (variance of logit for case-control studies).
+Matching the GWAS meta-analysis results to the genotype data ...
+Calculating allele frequencies ...
+Warning: can't match the reference alleles of 14 SNPs to those in the genotype data. These SNPs have been saved in [C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_GCTA_corrected.badsnps].
+2714 SNPs are matched to the genotype data.
+Calculating the variance of SNP genotypes ...
+
+Performing stepwise model selection on 2714 SNPs to select association signals ... (p cutoff = 5e-05; collinearity cutoff = 0.9)
+(Assuming complete linkage equilibrium between SNPs which are more than 10Mb away from each other)
+Finally, 2 associated SNPs are selected.
+Performing joint analysis on all the 2 selected signals ...
+Saving the 2 independent signals to [C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_GCTA_corrected.jma.cojo] ...
+Saving the LD structure of 2 independent signals to [C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_GCTA_corrected.ldr.cojo] ...
+Saving the conditional analysis results of 2712 remaining SNPs to [C:/Users/Hani/Desktop/FM/COJO_audit/Finn_SMAD3_GCTA_corrected.cma.cojo] ...
+(0 SNPs eliminated by backward selection and 0 SNPs filtered by collinearity test are not included in the output)
+
+Analysis finished at 01:15:57 Iran Standard Time on Sun Aug 30 2026
+Overall computational time: 0.13 sec.

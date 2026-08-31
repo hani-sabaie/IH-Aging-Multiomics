@@ -1,0 +1,99 @@
+source,target,TGFb_pathway_probability,condition,source_order,target_order
+FAP3,FAP3,0,Aged,1,1
+FAP3,Other FAPs,0.00372097493169434,Aged,1,2
+FAP3,MuSC,0,Aged,1,3
+FAP3,Myogenic,0,Aged,1,4
+FAP3,Immune,0.000814707203206453,Aged,1,5
+FAP3,Endothelial,0,Aged,1,6
+FAP3,Vascular stromal,0,Aged,1,7
+Other FAPs,FAP3,0,Aged,2,1
+Other FAPs,Other FAPs,0.00296786661142954,Aged,2,2
+Other FAPs,MuSC,0,Aged,2,3
+Other FAPs,Myogenic,0,Aged,2,4
+Other FAPs,Immune,0,Aged,2,5
+Other FAPs,Endothelial,0,Aged,2,6
+Other FAPs,Vascular stromal,0,Aged,2,7
+MuSC,FAP3,0,Aged,3,1
+MuSC,Other FAPs,0,Aged,3,2
+MuSC,MuSC,0,Aged,3,3
+MuSC,Myogenic,0,Aged,3,4
+MuSC,Immune,0,Aged,3,5
+MuSC,Endothelial,0,Aged,3,6
+MuSC,Vascular stromal,0,Aged,3,7
+Myogenic,FAP3,0,Aged,4,1
+Myogenic,Other FAPs,0,Aged,4,2
+Myogenic,MuSC,0,Aged,4,3
+Myogenic,Myogenic,0,Aged,4,4
+Myogenic,Immune,0,Aged,4,5
+Myogenic,Endothelial,0,Aged,4,6
+Myogenic,Vascular stromal,0,Aged,4,7
+Immune,FAP3,0.00290611234574351,Aged,5,1
+Immune,Other FAPs,0.0148149835461484,Aged,5,2
+Immune,MuSC,0,Aged,5,3
+Immune,Myogenic,0,Aged,5,4
+Immune,Immune,0.00462489514634429,Aged,5,5
+Immune,Endothelial,0,Aged,5,6
+Immune,Vascular stromal,0,Aged,5,7
+Endothelial,FAP3,0.000766877830060627,Aged,6,1
+Endothelial,Other FAPs,0.00409602886260056,Aged,6,2
+Endothelial,MuSC,0,Aged,6,3
+Endothelial,Myogenic,0,Aged,6,4
+Endothelial,Immune,0.00122043786754535,Aged,6,5
+Endothelial,Endothelial,0,Aged,6,6
+Endothelial,Vascular stromal,0,Aged,6,7
+Vascular stromal,FAP3,0.000814707203206453,Aged,7,1
+Vascular stromal,Other FAPs,0.00416639116956154,Aged,7,2
+Vascular stromal,MuSC,0,Aged,7,3
+Vascular stromal,Myogenic,0,Aged,7,4
+Vascular stromal,Immune,0.00129655530878565,Aged,7,5
+Vascular stromal,Endothelial,0,Aged,7,6
+Vascular stromal,Vascular stromal,0,Aged,7,7
+FAP3,FAP3,0.00713782388340354,Young,1,1
+FAP3,Other FAPs,0.00741635478870829,Young,1,2
+FAP3,MuSC,0,Young,1,3
+FAP3,Myogenic,0,Young,1,4
+FAP3,Immune,0.00157281363382656,Young,1,5
+FAP3,Endothelial,0,Young,1,6
+FAP3,Vascular stromal,0,Young,1,7
+Other FAPs,FAP3,0.0034801555666021,Young,2,1
+Other FAPs,Other FAPs,0.00362589571375577,Young,2,2
+Other FAPs,MuSC,0,Young,2,3
+Other FAPs,Myogenic,0,Young,2,4
+Other FAPs,Immune,0.000667135482298103,Young,2,5
+Other FAPs,Endothelial,0,Young,2,6
+Other FAPs,Vascular stromal,0,Young,2,7
+MuSC,FAP3,0,Young,3,1
+MuSC,Other FAPs,0,Young,3,2
+MuSC,MuSC,0,Young,3,3
+MuSC,Myogenic,0,Young,3,4
+MuSC,Immune,0,Young,3,5
+MuSC,Endothelial,0,Young,3,6
+MuSC,Vascular stromal,0,Young,3,7
+Myogenic,FAP3,0,Young,4,1
+Myogenic,Other FAPs,0,Young,4,2
+Myogenic,MuSC,0,Young,4,3
+Myogenic,Myogenic,0,Young,4,4
+Myogenic,Immune,0,Young,4,5
+Myogenic,Endothelial,0,Young,4,6
+Myogenic,Vascular stromal,0,Young,4,7
+Immune,FAP3,0.0154455507667822,Young,5,1
+Immune,Other FAPs,0.0157313872139029,Young,5,2
+Immune,MuSC,0,Young,5,3
+Immune,Myogenic,0,Young,5,4
+Immune,Immune,0.00651707614970862,Young,5,5
+Immune,Endothelial,0,Young,5,6
+Immune,Vascular stromal,0,Young,5,7
+Endothelial,FAP3,0.00434373824143576,Young,6,1
+Endothelial,Other FAPs,0.00442648084063999,Young,6,2
+Endothelial,MuSC,0,Young,6,3
+Endothelial,Myogenic,0,Young,6,4
+Endothelial,Immune,0.00182762291840955,Young,6,5
+Endothelial,Endothelial,0,Young,6,6
+Endothelial,Vascular stromal,0,Young,6,7
+Vascular stromal,FAP3,0.00451896545096288,Young,7,1
+Vascular stromal,Other FAPs,0.00458892538921764,Young,7,2
+Vascular stromal,MuSC,0,Young,7,3
+Vascular stromal,Myogenic,0,Young,7,4
+Vascular stromal,Immune,0.00206309426475199,Young,7,5
+Vascular stromal,Endothelial,0,Young,7,6
+Vascular stromal,Vascular stromal,0,Young,7,7

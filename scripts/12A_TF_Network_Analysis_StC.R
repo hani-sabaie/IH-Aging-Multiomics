@@ -28,8 +28,33 @@ library(Signac)
 # ===== set seed =====
 set.seed(1234)
 
-# ===== Helpers =====
-figdir <- "../outputs/TF"
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "TF")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "10_TF_network"
+)
+
+hdwgcna_file <- file.path(outdir, "hdWGCNA_obj.rds")
+tfnet_file <- file.path(outdir, "hdWGCNA_TFNet_obj.rds")
+dereg_l2g_file <- file.path(outdir, "hdWGCNA_TFNet_DEReg_L2G_obj.rds")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -50,7 +75,7 @@ wtxt <- function(v, path) write.table(v, path, quote = FALSE, row.names = FALSE,
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_obj.rds")
+obj <- readRDS(hdwgcna_file)
 
 # ========================
 # Transcription Factor Network Analysis
@@ -109,8 +134,8 @@ obj <- AssignTFRegulons(
 
 tfrgs <- GetTFRegulons(obj) # filtered TF-gene pairs (regulons)
 
-wcsv(tfnet, file.path("results_TF", "tf_network_full.csv"))
-wcsv(tfrgs, file.path("results_TF", "tf_regulons.csv"))
+wcsv(tfnet, file.path(processed_dir, "tf_network_full.csv"))
+wcsv(tfrgs, file.path(processed_dir, "tf_regulons.csv"))
 
 # ===== Calculate regulon expression signatures =====
 # Positive regulons
@@ -135,14 +160,14 @@ neg_regulon_scores <- GetRegulonScores(obj, target_type='negative')
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/hdWGCNA_TFNet_obj.rds")
+saveRDS(obj, tfnet_file)
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_TFNet_obj.rds")
+obj <- readRDS(tfnet_file)
 
 # ========================
 # Differential regulon analysis
@@ -162,7 +187,7 @@ dregs <- FindDifferentialRegulons(
   pseudocount.use = 1
 )
 
-wcsv(dregs, file.path("results_TF", "differential_regulons.csv"))
+wcsv(dregs, file.path(processed_dir, "differential_regulons.csv"))
 
 # show the table
 head(dregs)
@@ -375,11 +400,20 @@ tf_gene_peak_direct <- tf_targets_sig %>%
 
 wcsv(
   tf_gene_peak_direct,
-  file.path("results_TF", "TF_gene_peak_DIRECT_motifValidated_fap3.csv")
+  file.path(processed_dir, "TF_gene_peak_DIRECT_motifValidated_fap3.csv")
 )
 
 # High Confidence Full Integrated Filter
-bulk_de <- read.csv(file = "bulk_de_sig_faps.csv", header = T, sep = ",")
+bulk_de <- read.csv(
+  file = file.path(
+    repo_root,
+    "processed_results",
+    "02_differential_expression",
+    "bulk_de_sig_faps.csv"
+  ),
+  header = TRUE,
+  sep = ","
+)
 smad3_de_df <- bulk_de %>%
   dplyr::filter(
     gene == goi) %>%
@@ -425,20 +459,20 @@ tf_gene_peak_final <- tf_gene_peak_direct %>%
 
 wcsv(
   tf_gene_peak_final,
-  file.path("results_TF", "TF_gene_peak_DIRECT_motifValidated_fap3_highconf.csv")
+  file.path(processed_dir, "TF_gene_peak_DIRECT_motifValidated_fap3_highconf.csv")
 )
 
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/hdWGCNA_TFNet_DEReg_L2G_obj.rds")
+saveRDS(obj, dereg_l2g_file)
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_TFNet_obj.rds")
+obj <- readRDS(tfnet_file)
 
 # ========================
 # Module regulatory networks

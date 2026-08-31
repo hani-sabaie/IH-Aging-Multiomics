@@ -28,8 +28,32 @@ library(Signac)
 # ===== set seed =====
 set.seed(1234)
 
-# ===== Helpers =====
-figdir <- "../outputs/TF"
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "TF")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "10_TF_network"
+)
+
+hdwgcna_file <- file.path(outdir, "hdWGCNA_obj.rds")
+tfnet_b_file <- file.path(outdir, "hdWGCNA_TFNet_B_obj.rds")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -50,7 +74,7 @@ wtxt <- function(v, path) write.table(v, path, quote = FALSE, row.names = FALSE,
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_obj.rds")
+obj <- readRDS(hdwgcna_file)
 
 # ========================
 # Transcription Factor Network Analysis
@@ -110,8 +134,8 @@ obj <- AssignTFRegulons(
 
 tfrgs <- GetTFRegulons(obj) # filtered TF-gene pairs (regulons)
 
-wcsv(tfnet, file.path("results_TF", "tf_network_full_B.csv"))
-wcsv(tfrgs, file.path("results_TF", "tf_regulons_B.csv"))
+wcsv(tfnet, file.path(processed_dir, "tf_network_full_B.csv"))
+wcsv(tfrgs, file.path(processed_dir, "tf_regulons_B.csv"))
 
 # ===== Calculate regulon expression signatures =====
 # Positive regulons
@@ -136,14 +160,14 @@ neg_regulon_scores <- GetRegulonScores(obj, target_type='negative')
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/hdWGCNA_TFNet_B_obj.rds")
+saveRDS(obj, tfnet_b_file)
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_TFNet_B_obj.rds")
+obj <- readRDS(tfnet_b_file)
 
 # ========================
 # RegulonBarPlot

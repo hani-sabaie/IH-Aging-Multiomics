@@ -19,10 +19,10 @@ library(ggrepel)
 # ============================================================================ #
 
 # ===== Inputs =====
-gwas_file <- "C:/Users/Hani/Desktop/FM/UKB_SMAD3_250kb.txt"
-bim_file <- "C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/UKB_SMAD3_1000G_EUR.bim"
-ld_file <- "C:/Users/Hani/Desktop/plink2_win64_20251111/INHR/UKB_SMAD3_1000G_EUR_LD.ld"
-eqtl_file <- "C:/Users/Hani/Desktop/smr-1.3.1-win-x86_64/For_COLOC/myLiteCisEqtl.txt"
+gwas_file <- "./UKB_SMAD3_250kb.txt"
+bim_file <- "../data/1000Genomes/UKB_SMAD3_1000G_EUR.bim"
+ld_file <- "../data/1000Genomes/UKB_SMAD3_1000G_EUR_LD.ld"
+eqtl_file <- "../data/GTEx_v8/myLiteCisEqtl.txt"
 
 # GWAS case–control numbers
 ncase <- 28707

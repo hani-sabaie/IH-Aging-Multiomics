@@ -10,8 +10,33 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 # ===== set seed =====
 set.seed(1234)
 
-# ===== Helpers =====
-figdir <- "../outputs/TF"
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "TF")
+
+dereg_l2g_file <- file.path(
+  outdir,
+  "hdWGCNA_TFNet_DEReg_L2G_obj.rds"
+)
+
+foot_file <- file.path(
+  outdir,
+  "hdWGCNA_TFNet_DEReg_L2G_Foot_obj.rds"
+)
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -32,7 +57,7 @@ wtxt <- function(v, path) write.table(v, path, quote = FALSE, row.names = FALSE,
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_TFNet_DEReg_L2G_obj.rds")
+obj <- readRDS(dereg_l2g_file)
 
 # ========================
 # Motif footprinting
@@ -80,7 +105,7 @@ save_gg(p3, "genomic_tracks.png", w=8, h=6)
 # Save the object
 # ========================
 
-saveRDS(obj,"../outputs/hdWGCNA_TFNet_DEReg_L2G_Foot_obj.rds")
+saveRDS(obj, foot_file)
 
 
 

@@ -1,0 +1,2 @@
+"","gene_short_name","num_cells_expressed","gene_id","status","term","estimate","std_err","test_val","p_value","normalized_effect","model_component","q_value"
+"1","SMAD3",7235,"SMAD3","OK","conditionYoung",-0.397097657004157,0.0214844168998776,-18.483054897637,2.0483812263499e-75,-0.560334100856422,"count",2.0483812263499e-75

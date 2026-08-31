@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this code or processed resource collection, please cite this repository and the associated study."
+title: "IH-Aging-Multiomics"
+type: software
+
+authors:
+  - given-names: "Amir Hesam"
+    family-names: "Saeidian"
+  - given-names: "Hani"
+    family-names: "Sabaie"
+  - given-names: "Mahdi"
+    family-names: "Akbarzadeh"
+  - given-names: "Hassan"
+    family-names: "Vahidnezhad"
+  - given-names: "Leila"
+    family-names: "Youssefian"
+  - given-names: "Hakon"
+    family-names: "Hakonarson"
+  - given-names: "Shahin"
+    family-names: "Talebi"
+  - given-names: "Amir Hossein"
+    family-names: "Saeidian"
+
+abstract: >-
+  Reproducible analysis code and processed resources supporting the study
+  "Integrative single-nucleus multi-omics and Mendelian randomization
+  analyses prioritize SMAD3 as a candidate susceptibility gene linking
+  aging-associated fibro-adipogenic progenitor dysregulation to inguinal
+  hernia."
+
+repository-code: "https://github.com/hani-sabaie/IH-Aging-Multiomics"
+
+license: MIT
+
+keywords:
+  - inguinal hernia
+  - aging
+  - single-nucleus RNA-seq
+  - single-nucleus ATAC-seq
+  - multi-omics
+  - fibro-adipogenic progenitors
+  - SMAD3
+  - Mendelian randomization
+  - SMR
+  - colocalization

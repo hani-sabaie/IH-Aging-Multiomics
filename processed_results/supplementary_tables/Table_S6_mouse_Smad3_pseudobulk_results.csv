@@ -1,0 +1,31 @@
+,gene,celltype,contrast,avg_log2FC,p_val,p_val_adj
+Smad3...1951,Smad3,Type IIa Myofiber,Veh_vs_EP,-1.35,4e-04,0.0598
+Smad3...11751,Smad3,Type IIa Myofiber,EPR_vs_EP,-1.08,0.0033,0.2207
+Smad3...13287,Smad3,Macrophage (APC),Veh_vs_EP,-0.71,0.0259,0.238
+Smad3...14826,Smad3,Type I Myofiber,Veh_vs_EP,-1.08,0.0117,0.2556
+Smad3...18339,Smad3,MuSC,EPR_vs_EP,-0.89,0.0413,0.2986
+Smad3...28184,Smad3,MuSC,Veh_vs_EP,-0.54,0.0642,0.3985
+Smad3...36558,Smad3,Macrophage (M2),Veh_vs_EP,-0.36,0.1567,0.4666
+Smad3...39258,Smad3,Mesothelial-like,EPR_vs_EP,-0.48,0.1685,0.4879
+Smad3...41566,Smad3,Macrophage (APC),EPR_vs_EP,-0.7,0.1567,0.5046
+Smad3...55914,Smad3,Type IIb Myofiber,EPR_vs_EP,-0.61,0.2171,0.6055
+Smad3...71236,Smad3,Type IIb Myofiber,Veh_vs_EP,-0.37,0.4509,0.6983
+Smad3...84712,Smad3,Pgr- Fibroblast,EPR_vs_EP,-0.17,0.4944,0.7677
+Smad3...85491,Smad3,Endothelial,EPR_vs_EP,-0.27,0.4818,0.7703
+Smad3...87772,Smad3,Pgr- Fibroblast,Veh_vs_EP,-0.2,0.4447,0.7823
+Smad3...91581,Smad3,Type I Myofiber,EPR_vs_EP,-0.39,0.3511,0.7986
+Smad3...111029,Smad3,Endothelial,Veh_vs_EP,-0.11,0.7395,0.8787
+Smad3...112754,Smad3,Macrophage (M2),EPR_vs_EP,-0.28,0.5974,0.8867
+Smad3...115697,Smad3,B Cell,EPR_vs_EP,0.31,0.7315,0.8961
+Smad3...119386,Smad3,Mesothelial-like,Veh_vs_EP,-0.1,0.7493,0.9083
+Smad3...134700,Smad3,B Cell,Veh_vs_EP,0.11,0.8333,0.9514
+Smad3...141417,Smad3,Endothelial,Veh_vs_EPR,0.17,0.6895,0.9678
+Smad3...151610,Smad3,Type IIa Myofiber,Veh_vs_EPR,-0.27,0.4108,0.98
+Smad3...155710,Smad3,B Cell,Veh_vs_EPR,-0.2,0.8192,0.9824
+Smad3...158127,Smad3,Macrophage (M2),Veh_vs_EPR,-0.08,0.8748,0.9871
+Smad3...161167,Smad3,Type I Myofiber,Veh_vs_EPR,-0.69,0.1419,0.9892
+Smad3...169082,Smad3,MuSC,Veh_vs_EPR,0.35,0.4153,0.9917
+Smad3...185349,Smad3,Macrophage (APC),Veh_vs_EPR,-0.01,0.9775,0.9967
+Smad3...185972,Smad3,Pgr- Fibroblast,Veh_vs_EPR,-0.02,0.9317,0.9972
+Smad3...193729,Smad3,Type IIb Myofiber,Veh_vs_EPR,0.23,0.649,0.9977
+Smad3...201316,Smad3,Mesothelial-like,Veh_vs_EPR,0.38,0.2955,0.9979

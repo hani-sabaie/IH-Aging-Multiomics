@@ -20,18 +20,55 @@ library(Signac)
 # ===== set seed =====
 set.seed(1234)
 
+# ===== Repository paths =====
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_dir <- dirname(normalizePath(sub("^--file=", "", file_arg)))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
+input_obj_file <- Sys.getenv(
+  "HDWGCNA_INPUT_RDS",
+  unset = file.path(
+    repo_root,
+    "outputs",
+    "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
+  )
+)
+
 # ===== Helpers =====
-resdir <- "../outputs/results_hdWGCNA"
+outdir <- file.path(repo_root, "outputs")
+figdir <- file.path(outdir, "hdWGCNA")
+processed_dir <- file.path(
+  repo_root,
+  "processed_results",
+  "05_hdWGCNA"
+)
+
+hdwgcna_obj_file <- file.path(outdir, "hdWGCNA_obj.rds")
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(processed_dir, recursive = TRUE, showWarnings = FALSE)
+
+if (!file.exists(input_obj_file)) {
+  stop("Required annotated Seurat object not found: ", input_obj_file)
+}
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
-    ggsave(file.path(resdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
+    ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
   } else {
-    png(file.path(resdir, filename), width=w, height=h, units="in", res=dpi)
+    png(file.path(figdir, filename), width=w, height=h, units="in", res=dpi)
     print(p); dev.off()
   }
 }
 save_dev <- function(filename, expr, w=7, h=5, dpi=300){
-  png(file.path(resdir, filename), width=w, height=h, units="in", res=dpi)
+  png(file.path(figdir, filename), width=w, height=h, units="in", res=dpi)
   on.exit(dev.off(), add=TRUE); force(expr)
 }
 wcsv <- function(x, path) write.csv(x, path, row.names = TRUE)
@@ -48,7 +85,7 @@ enableWGCNAThreads(nThreads = 8)
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds")
+obj <- readRDS(input_obj_file)
 
 # Subset just one cell type 
 obj <- obj %>% subset(cell_type == 'FAPs')
@@ -171,11 +208,11 @@ save_gg(p, "PlotKMEs.png", w=8, h=5)
 # ===== Tables =====
 # Get the module assignment table
 modules <- GetModules(obj) %>% subset(module != 'grey')
-wcsv(modules, file.path("results_hdWGCNA", "module_assignment_table.csv"))
+wcsv(modules, file.path(processed_dir, "module_assignment_table.csv"))
 
 # Get hub genes
 hub_df <- GetHubGenes(obj, n_hubs = 10)
-wcsv(hub_df, file.path("results_hdWGCNA", "hub_genes.csv"))
+wcsv(hub_df, file.path(processed_dir, "hub_genes.csv"))
 
 # ===== Hub gene signature scores =====
 # Compute gene scoring for the top 25 hub genes by kME for each module
@@ -219,14 +256,14 @@ save_gg(wrap_plots(plot_list, ncol=4), "ModuleRadarPlot.png", w=8, h=5)
 # ========================
 # Save the object
 # ========================
-saveRDS(obj,"../outputs/hdWGCNA_obj.rds")
+saveRDS(obj, hdwgcna_obj_file)
 
 # ============================================================================ #
 
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_obj.rds")
+obj <- readRDS(hdwgcna_obj_file)
 
 # ========================
 # Module Trait Correlation
@@ -258,7 +295,10 @@ combine_ct <- function(ct){
   as.data.frame(out, check.names = FALSE)
 }
 cts <- names(mt_cor$cor)
-write_xlsx(setNames(lapply(cts, combine_ct), paste0(cts, "_wide")), "mt_cor_wide_all.xlsx")
+write_xlsx(
+  setNames(lapply(cts, combine_ct), paste0(cts, "_wide")),
+  file.path(processed_dir, "mt_cor_wide_all.xlsx")
+)
 
 # Plot Correlation Heatmap
 save_gg(PlotModuleTraitCorrelation(
@@ -280,7 +320,7 @@ save_gg(PlotModuleTraitCorrelation(
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_obj.rds")
+obj <- readRDS(hdwgcna_obj_file)
 
 # ========================
 # Differential module eigengene (DME) analysis
@@ -434,7 +474,7 @@ save_gg(p, "brown_module_gene_network.png", w=15, h=12)
 # ========================
 # Load the object
 # ========================
-obj <- readRDS("../outputs/hdWGCNA_obj.rds")
+obj <- readRDS(hdwgcna_obj_file)
 
 # ========================
 # Enrichment analysis

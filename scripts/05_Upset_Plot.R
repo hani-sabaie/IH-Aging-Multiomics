@@ -8,9 +8,24 @@ library(ggplot2)
 library(data.table)
 library(dplyr)
 
+# Locate repository root from this script
+args <- commandArgs(trailingOnly = FALSE)
+file_arg <- grep("^--file=", args, value = TRUE)
+
+if (length(file_arg) == 1) {
+  script_path <- sub("^--file=", "", file_arg)
+  script_dir <- dirname(normalizePath(script_path))
+  repo_root <- normalizePath(file.path(script_dir, ".."))
+} else {
+  repo_root <- normalizePath(".")
+}
+
 # ===== Helpers =====
-figdir <- "../outputs/Venn"
-outdir <- "../outputs/Venn"
+outdir <- file.path(repo_root, "outputs", "Venn")
+figdir <- outdir
+
+dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+
 save_gg <- function(p, filename, w=7, h=5, dpi=300){
   if (inherits(p, "ggplot") || inherits(p, "patchwork")){
     ggsave(file.path(figdir, filename), p, width=w, height=h, units="in", dpi=dpi, bg="white")
@@ -24,7 +39,15 @@ wcsv <- function(x, path) write.csv(x, path, row.names = TRUE)
 
 # ============================================================================ #
 # ===== UpsetPlot =====
-modules <- read.table("module_assignment_table.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+modules <- read.csv(
+  file.path(
+    repo_root,
+    "processed_results",
+    "05_hdWGCNA",
+    "module_assignment_table.csv"
+  ),
+  stringsAsFactors = FALSE
+)
 mods <- sort(unique(modules$module))
 modules_genes <- setNames(vector("list", length(mods)), mods)
 
@@ -48,12 +71,27 @@ for (m in mods) {
 }
 
 
-bulk_de_sig_faps <- read.csv(file = "bulk_de_sig_faps.csv", header = T,sep = ",")
+bulk_de_sig_faps <- read.csv(
+  file.path(
+    repo_root,
+    "processed_results",
+    "02_differential_expression",
+    "bulk_de_sig_faps.csv"
+  )
+)
 DEGs_FAPs_genes <- unique(bulk_de_sig_faps$gene)
 
-smr_res_sig <- read.csv(file = "SMR_all_studies_all_tissues_sig.csv", header = T,sep = ",")
+smr_res_sig <- read.csv(
+  file = file.path(
+  repo_root,
+  "processed_results",
+  "06_SMR_HEIDI",
+  "SMR_all_studies_all_tissues_sig.csv"
+),
+  header = TRUE
+)
 smr_res_sig_UKBB <- smr_res_sig %>% subset(study == 'UKB')
-smr_res_sig_Finn <- smr_res_sig %>% subset(study == 'Finngen')
+smr_res_sig_Finn <- smr_res_sig %>% subset(study == "FinnGen")
 smr_res_sig_UKBB_genes <- unique(smr_res_sig_UKBB$Gene)
 smr_res_sig_Finn_genes <- unique(smr_res_sig_Finn$Gene)
 

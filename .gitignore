@@ -1,0 +1,11 @@
+# Local input data
+# Third-party/raw datasets are not redistributed through this repository.
+data/
+
+# Local analysis outputs
+# Large serialized analysis objects/checkpoints are archived separately.
+outputs/
+
+# R interactive history files
+.Rhistory
+**/.Rhistory

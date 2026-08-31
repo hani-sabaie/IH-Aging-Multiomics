@@ -1,0 +1,7 @@
+# Some exported tabular result files contain intentional trailing tab fields.
+# Preserve them exactly and do not treat those fields as whitespace errors.
+
+source_data/figure_source_data/Figure_13/Figure13A_UKB_locusplot_source_data.tsv -whitespace
+source_data/figure_source_data/Figure_13/Figure13B_FinnGen_locusplot_source_data.tsv -whitespace
+processed_results/07_GCTA_COJO/Finn_SMAD3_GCTA_corrected.ldr.cojo -whitespace
+processed_results/07_GCTA_COJO/UKB_SMAD3_GCTA_corrected.ldr.cojo -whitespace
