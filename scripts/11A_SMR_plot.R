@@ -75,8 +75,8 @@ for (this_study in unique(smr_all$study)) {
   
   # Calculate y-limits based on the data for SMR and HEIDI plots
   ymax_smr   <- max(dat_gene$log_pSMR, na.rm = TRUE) + 0.8
-  ymax_heidi <- max(dat_gene$log_pHEIDI, na.rm = TRUE) + 1
-  ymin_heidi <- min(0, min(dat_gene$log_pHEIDI, na.rm = TRUE)) + 0.12  # Set ymin_heidi slightly above zero to fix the issue
+  ymax_heidi <- max(c(dat_gene$log_pHEIDI, thr_heidi), na.rm = TRUE) + 0.5
+  ymin_heidi <- 0
   
   # Small data frames for nice threshold labels
   thr_lab_smr <- data.frame(
@@ -149,7 +149,7 @@ for (this_study in unique(smr_all$study)) {
     scale_x_discrete(position = "top") +  # Keep x-axis but remove labels
     coord_cartesian(ylim = c(ymin_heidi, ymax_heidi), clip = "off") +
     scale_y_reverse(
-  expand = expansion(mult = c(0, 0.05))
+  expand = expansion(mult = c(0, 0))
 ) +  # Flip HEIDI axis here
     theme_classic() +
     theme(
