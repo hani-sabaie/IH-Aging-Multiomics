@@ -280,8 +280,12 @@ for (cf in fap_levels) {
       n_Aged = length(aged),
       mean_Young = mean(young, na.rm = TRUE),
       mean_Aged = mean(aged, na.rm = TRUE),
+      mean_diff_Aged_minus_Young =
+        mean(aged, na.rm = TRUE) - mean(young, na.rm = TRUE),
       median_Young = median(young, na.rm = TRUE),
       median_Aged = median(aged, na.rm = TRUE),
+      median_diff_Aged_minus_Young =
+        median(aged, na.rm = TRUE) - median(young, na.rm = TRUE),
       W = unname(wt$statistic),
       p_value = wt$p.value
     )
@@ -291,6 +295,13 @@ for (cf in fap_levels) {
 }
 
 wilcox_stats <- rbindlist(stats_list)
+
+# Benjamini-Hochberg correction across the 16 prespecified
+# FAP-subcluster x transcription-factor comparisons.
+wilcox_stats[
+  ,
+  p_adj_BH := p.adjust(p_value, method = "BH")
+]
 
 wilcox_stats[
   ,
@@ -302,6 +313,23 @@ wilcox_stats[
         p_value <= 0.01, "**",
         fifelse(
           p_value <= 0.05, "*",
+          "ns"
+        )
+      )
+    )
+  )
+]
+
+wilcox_stats[
+  ,
+  p_adj_significance := fifelse(
+    p_adj_BH <= 0.0001, "****",
+    fifelse(
+      p_adj_BH <= 0.001, "***",
+      fifelse(
+        p_adj_BH <= 0.01, "**",
+        fifelse(
+          p_adj_BH <= 0.05, "*",
           "ns"
         )
       )

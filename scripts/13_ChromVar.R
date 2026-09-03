@@ -282,16 +282,50 @@ df_plot$condition <- factor(df_plot$condition, levels=c("Young","Aged"))
 df_plot$TF <- factor(df_plot$TF,  levels=c("ETS2","ETS1","FOS","SMAD3"))
 df_plot$FAP <- factor(df_plot$FAP, levels=c("FAP1","FAP2","FAP3","FAP4"))
 
+# Wilcoxon tests for the 16 FAP x TF comparisons.
+# P values are adjusted across all comparisons using BH FDR.
+stats_fdr <- df_plot %>%
+  dplyr::group_by(FAP, TF) %>%
+  dplyr::summarise(
+    p_value = wilcox.test(
+      value[condition == "Young"],
+      value[condition == "Aged"]
+    )$p.value,
+    y_max = max(value, na.rm = TRUE),
+    y_min = min(value, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  dplyr::mutate(
+    p_adj_BH = p.adjust(p_value, method = "BH"),
+    p_adj_significance = dplyr::case_when(
+      p_adj_BH <= 0.0001 ~ "****",
+      p_adj_BH <= 0.001  ~ "***",
+      p_adj_BH <= 0.01   ~ "**",
+      p_adj_BH <= 0.05   ~ "*",
+      TRUE               ~ "ns"
+    ),
+    y.position = y_max + 0.08 * (y_max - y_min),
+    group1 = "Young",
+    group2 = "Aged"
+  )
+
+# Only significant FDR-adjusted comparisons are annotated.
+stats_fdr_sig <- stats_fdr %>%
+  dplyr::filter(p_adj_significance != "ns")
+
 p_facet <- ggplot(df_plot, aes(x=condition, y=value, fill=condition)) +
   geom_half_violin(side="l", alpha=0.6, trim=FALSE) +
   geom_half_boxplot(side="r", width=0.25, alpha=1, outlier.shape = NA) +
   geom_jitter(width=0.1, alpha=0.25, size=0.6) +
-  stat_compare_means(
-    method="wilcox.test",
-    label="p.signif",
-    hide.ns=TRUE,
+  ggpubr::stat_pvalue_manual(
+    stats_fdr_sig,
+    label="p_adj_significance",
+    xmin="group1",
+    xmax="group2",
+    y.position="y.position",
+    tip.length=0.01,
     size=3,
-    comparisons=list(c("Young","Aged"))
+    inherit.aes=FALSE
   ) +
   facet_grid(TF ~ FAP, scales="free_y") +
   scale_fill_manual(values=c("#1f78b4","#e31a1c")) +
@@ -299,7 +333,7 @@ p_facet <- ggplot(df_plot, aes(x=condition, y=value, fill=condition)) +
   labs(
     y="chromVAR deviation",
     x="",
-    title="chromVAR Motif Activity — Raincloud (FAP1–4 × ETS2/ETS1/FOS/SMAD3)"
+    title="chromVAR Motif Deviation Scores: Raincloud (FAP1-4 x ETS2/ETS1/FOS/SMAD3)"
   )
 
 ggsave(

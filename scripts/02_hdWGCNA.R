@@ -323,9 +323,9 @@ save_gg(PlotModuleTraitCorrelation(
 obj <- readRDS(hdwgcna_obj_file)
 
 # ========================
-# Differential module eigengene (DME) analysis
+# Differential module-score analysis
 # ========================
-# ===== DME analysis comparing two groups =====
+# ===== Global module-score analysis comparing two groups =====
 group1 <- obj@meta.data %>% subset(condition == "Aged") %>% rownames
 group2 <- obj@meta.data %>% subset(condition == "Young") %>% rownames
 head(group1)
@@ -336,9 +336,16 @@ DMEs <- FindDMEs(
   barcodes1 = group1,
   barcodes2 = group2,
   test.use='wilcox',
+  pseudocount.use = 0.01,
   wgcna_name='SCT'
 )
 DMEs$Comparisons <- "Aged_vs_Young" 
+
+write.csv(
+  DMEs,
+  file.path(processed_dir, "DME_Aged_vs_Young.csv"),
+  row.names = FALSE
+)
 head(DMEs)
 
 save_gg(PlotDMEsLollipop(
@@ -373,6 +380,7 @@ for(cur_cluster in clusters){
   # Run the DME test
   cur_DMEs <- FindDMEs(
     obj,
+    features = "ModuleScores",
     barcodes1 = group1,
     barcodes2 = group2,
     test.use ='wilcox',
@@ -386,6 +394,12 @@ for(cur_cluster in clusters){
   # append the table
   DMEs <- rbind(DMEs, cur_DMEs)
 }
+
+write.csv(
+  DMEs,
+  file.path(processed_dir, "DME_FAP_subclusters_Aged_vs_Young.csv"),
+  row.names = FALSE
+)
 
 # Get the modules table
 modules <- GetModules(obj)
