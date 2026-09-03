@@ -166,15 +166,18 @@ for (cf in expected_fap) {
         condition %in% c("Veh", "EP")
     ]
 
-    n_veh <- sum(d$condition == "Veh")
-    n_ep  <- sum(d$condition == "EP")
+    veh <- d[condition == "Veh", chromVAR_deviation]
+    ep  <- d[condition == "EP", chromVAR_deviation]
+
+    n_veh <- length(veh)
+    n_ep  <- length(ep)
 
     if (n_veh > 0 && n_ep > 0) {
 
       wt <- suppressWarnings(
         stats::wilcox.test(
-          chromVAR_deviation ~ condition,
-          data = as.data.frame(d),
+          veh,
+          ep,
           alternative = "two.sided"
         )
       )
@@ -192,6 +195,14 @@ for (cf in expected_fap) {
       motif_id = tf_to_motif[[tf]],
       n_Veh = n_veh,
       n_EP = n_ep,
+      mean_Veh = mean(veh, na.rm = TRUE),
+      mean_EP = mean(ep, na.rm = TRUE),
+      mean_diff_EP_minus_Veh =
+        mean(ep, na.rm = TRUE) - mean(veh, na.rm = TRUE),
+      median_Veh = median(veh, na.rm = TRUE),
+      median_EP = median(ep, na.rm = TRUE),
+      median_diff_EP_minus_Veh =
+        median(ep, na.rm = TRUE) - median(veh, na.rm = TRUE),
       wilcoxon_p_value = pval
     )
 
@@ -200,6 +211,13 @@ for (cf in expected_fap) {
 }
 
 fig20b_stats <- rbindlist(stats_list)
+
+# Benjamini-Hochberg correction across the 12 prespecified
+# cell-type x transcription-factor comparisons.
+fig20b_stats[
+  ,
+  p_adj_BH := p.adjust(wilcoxon_p_value, method = "BH")
+]
 
 fig20b_stats[
   ,
@@ -213,6 +231,25 @@ fig20b_stats[
           wilcoxon_p_value <= 0.01, "**",
           fifelse(
             wilcoxon_p_value <= 0.05, "*", "ns"
+          )
+        )
+      )
+    )
+  )
+]
+
+fig20b_stats[
+  ,
+  p_adj_significance := fifelse(
+    is.na(p_adj_BH), NA_character_,
+    fifelse(
+      p_adj_BH <= 0.0001, "****",
+      fifelse(
+        p_adj_BH <= 0.001, "***",
+        fifelse(
+          p_adj_BH <= 0.01, "**",
+          fifelse(
+            p_adj_BH <= 0.05, "*", "ns"
           )
         )
       )
