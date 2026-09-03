@@ -63,13 +63,5 @@ Rows: 30 Smad3 pseudobulk results:
 - EPR_vs_EP: 10
 - Veh_vs_EPR: 10
 
-## Manuscript consistency note
-
-The canonical reproducible files contain 704 records in Table S2 and
-159 records in Table S3. Table S3 is exactly the FAP1-FAP4 subset of
-Table S2. Any manuscript text reporting 708 total DEGs or 165 FAP DEGs
-should therefore be reconciled with these canonical results during
-manuscript revision rather than altering the processed data.
-
 Table S1 is the STROBE-MR checklist and is handled separately from
 these analysis-result tables.

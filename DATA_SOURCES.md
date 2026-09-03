@@ -100,7 +100,7 @@ For each variant, the analysis retained or derived:
 - sample size
 
 The processed summary statistics used by the analysis scripts are
-author-generated derived resources and will be provided separately from the
+author-generated derived resources and are provided separately from the
 original third-party GWAS data where redistribution is appropriate.
 
 ---
@@ -299,7 +299,7 @@ original files.
 ### Author-generated processed resources
 
 Author-generated summary-level results underlying the analyses, figures, and
-tables will be provided in the `processed_results/` and `source_data/`
+tables are provided in the `processed_results/` and `source_data/`
 directories where redistribution is appropriate.
 
 These resources are intended to facilitate reproduction of the reported
@@ -332,4 +332,4 @@ data/
 The `data/` directory should not be committed to the repository.
 
 Exact input filenames required by individual analyses are documented in the
-analysis scripts and will also be summarized in `RUN_ORDER.md`.
+analysis scripts and are also summarized in `RUN_ORDER.md`.

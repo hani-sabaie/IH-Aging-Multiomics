@@ -87,8 +87,7 @@ when their original access or redistribution conditions do not permit it.
 
 Analyses were conducted using R (v4.5.2) together with command-line tools.
 The repository contains the analysis scripts used for the computational
-workflows described in the manuscript. As part of the revised reproducibility
-package, the repository is being organized to provide explicit documentation
+workflows described in the manuscript and provides explicit documentation
 of data acquisition, software dependencies, analysis execution order, and
 author-generated processed results underlying the reported analyses.
 

@@ -1,8 +1,7 @@
 # Analysis run order
 
 This file summarizes the recommended execution order for the analyses in
-this repository. Detailed input/output requirements will be added below
-after the workflow order is validated.
+this repository. Detailed input/output requirements are provided below.
 
 ## 1. Human single-nucleus multiome workflow
 

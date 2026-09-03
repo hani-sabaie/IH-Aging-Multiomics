@@ -1,4 +1,4 @@
-Generated from the analysis environment used for manuscript revision.
+Generated from the analysis environment used for this study.
 
 R version:
 R version 4.5.2 (2025-10-31 ucrt)
