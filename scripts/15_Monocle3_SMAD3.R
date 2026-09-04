@@ -197,8 +197,14 @@ save_gg(ggplot(pt_df_ya, aes(x = pseudotime, y = SMAD3_expr, color = condition))
   ),"monocle_FAP1_3_SMAD3_pseudotime_condition_alt.png",w=8,h=5)
 
 # Test condition effect on SMAD3 along the trajectory (fit_models)
-# Fit a model with condition + smooth pseudotime
-# We use a spline on pseudotime to capture non-linear trends.
+# Fit a cell-level model with condition + smooth pseudotime.
+# Explicitly use Aged as the reference level so that conditionYoung
+# represents Young relative to Aged.
+cds_ya$condition <- factor(
+  cds_ya$condition,
+  levels = c("Aged", "Young")
+)
+
 smad3_fit <- fit_models(
   cds_ya["SMAD3", ],
   model_formula_str = "~ condition + splines::ns(pseudotime, df = 3)"
@@ -207,7 +213,7 @@ smad3_fit <- fit_models(
 coef_tab <- coefficient_table(smad3_fit)
 coef_tab
 
-# Extract the condition effect row (Aged vs Young)
+# Extract the condition effect row (Young vs Aged)
 # The exact term name depends on factor coding; here we search for "condition".
 cond_effect <- coef_tab %>%
   dplyr::filter(grepl("condition", term))
@@ -216,5 +222,5 @@ cond_effect_clean <- cond_effect |>
   dplyr::select(-model, -model_summary)
 
 wcsv(cond_effect_clean, file.path(processed_dir, "condition_effect_SMAD3_trajectory.csv"))
-# If q_value for condition term < 0.05:
-# => SMAD3 is significantly different between Young and Aged along the trajectory.
+# The conditionYoung coefficient estimates Young relative to Aged
+# after adjustment for the smooth pseudotime term.

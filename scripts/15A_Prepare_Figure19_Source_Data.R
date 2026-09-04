@@ -282,6 +282,13 @@ cat(
   "\n"
 )
 
+# Explicitly use Aged as the reference level so that conditionYoung
+# represents Young relative to Aged.
+cds_ya$condition <- factor(
+  cds_ya$condition,
+  levels = c("Aged", "Young")
+)
+
 smad3_fit <- fit_models(
   cds_ya["SMAD3", ],
   model_formula_str =
