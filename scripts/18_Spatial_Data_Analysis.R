@@ -293,10 +293,166 @@ for (s in sample_info$sample) {
   
   K_cross_s <- Kcross(pp_s, i = "Smad3", j = "PosTarget")
   
-  png(file.path(figdir, paste0("Kcross_Smad3_PosTargets_", s, ".png")),
-      width = 900, height = 700, res = 300)
-  plot(K_cross_s,
-       main = paste0("Kcross(Smad3, Pos targets) — ", s))
+  # Publication-quality rendering of the original Kcross object.
+  # Plotting only; the Kcross calculation is unchanged.
+  kdf <- as.data.frame(K_cross_s)
+
+  pick_col <- function(candidates) {
+    hit <- intersect(candidates, names(kdf))
+    if (length(hit) == 0) {
+      stop(
+        "Expected Kcross column not found: ",
+        paste(candidates, collapse = ", ")
+      )
+    }
+    hit[1]
+  }
+
+  r_col     <- pick_col(c("r"))
+  iso_col   <- pick_col(c("iso", "isotropic"))
+  trans_col <- pick_col(c("trans", "translate"))
+  bord_col  <- pick_col(c("border", "bord", "bord.modif"))
+  theo_col  <- pick_col(c("theo", "pois"))
+
+  draw_kcross <- function() {
+
+    yr <- range(
+      c(
+        kdf[[iso_col]],
+        kdf[[trans_col]],
+        kdf[[bord_col]],
+        kdf[[theo_col]]
+      ),
+      finite = TRUE
+    )
+
+    par(
+      mar = c(4.5, 7.0, 3.5, 1.0),
+      mgp = c(2.8, 0.8, 0),
+      las = 1,
+      bty = "l",
+      cex.axis = 1.0,
+      cex.lab = 1.1,
+      cex.main = 1.1
+    )
+
+    # Draw the plot without the default y axis so that tick labels
+    # and the y-axis title can be positioned cleanly and consistently.
+    plot(
+      kdf[[r_col]],
+      kdf[[iso_col]],
+      type = "l",
+      lwd = 2.4,
+      col = "grey25",
+      ylim = yr,
+      xlab = "r",
+      ylab = "",
+      yaxt = "n",
+      main = paste0(
+        "Kcross(Smad3, Pos targets): ",
+        s
+      )
+    )
+
+    y_ticks <- pretty(yr)
+
+    axis(
+      side = 2,
+      at = y_ticks,
+      labels = formatC(
+        y_ticks,
+        format = "e",
+        digits = 1
+      ),
+      las = 1,
+      cex.axis = 0.95
+    )
+
+    mtext(
+      expression(K[cross](r)),
+      side = 2,
+      line = 4.2,
+      las = 0,
+      cex = 1.10
+    )
+
+    lines(
+      kdf[[r_col]],
+      kdf[[trans_col]],
+      lwd = 2.4,
+      lty = 2,
+      col = "#D55E00"
+    )
+
+    lines(
+      kdf[[r_col]],
+      kdf[[bord_col]],
+      lwd = 2.2,
+      lty = 3,
+      col = "#009E73"
+    )
+
+    lines(
+      kdf[[r_col]],
+      kdf[[theo_col]],
+      lwd = 2.4,
+      lty = 4,
+      col = "#0072B2"
+    )
+
+    legend(
+      "topleft",
+      legend = c(
+        "Isotropic",
+        "Translation",
+        "Border",
+        "Poisson expectation"
+      ),
+      col = c(
+        "grey25",
+        "#D55E00",
+        "#009E73",
+        "#0072B2"
+      ),
+      lty = c(1, 2, 3, 4),
+      lwd = c(2.4, 2.4, 2.2, 2.4),
+      bty = "n",
+      cex = 0.85
+    )
+  }
+
+  png(
+    file.path(
+      figdir,
+      paste0(
+        "Kcross_Smad3_PosTargets_",
+        s,
+        ".png"
+      )
+    ),
+    width = 1800,
+    height = 1400,
+    res = 300,
+    type = "cairo"
+  )
+
+  draw_kcross()
+  dev.off()
+
+  cairo_pdf(
+    file.path(
+      figdir,
+      paste0(
+        "Kcross_Smad3_PosTargets_",
+        s,
+        ".pdf"
+      )
+    ),
+    width = 6,
+    height = 4.67
+  )
+
+  draw_kcross()
   dev.off()
   
   saveRDS(
