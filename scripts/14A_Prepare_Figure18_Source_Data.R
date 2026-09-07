@@ -39,14 +39,21 @@ if (!file.exists(obj_file)) {
   )
 }
 
-srcdir <- file.path(
-  repo_root,
-  "source_data",
-  "figure_source_data",
-  "Figure_18"
+srcdir <- Sys.getenv(
+  "FIG18_SOURCE_DIR",
+  unset = file.path(
+    repo_root,
+    "source_data",
+    "figure_source_data",
+    "Figure_18"
+  )
 )
 
-dir.create(srcdir, recursive = TRUE, showWarnings = FALSE)
+dir.create(
+  srcdir,
+  recursive = TRUE,
+  showWarnings = FALSE
+)
 
 cat("Loading CellChat object...\n")
 x <- readRDS(obj_file)
@@ -624,10 +631,12 @@ fig18f[
   figure_panel := "Figure18F"
 ]
 
-# Add the original CellChat probability and p-value directly from @net.
+# Add the communication probability and the revised inferential P value
+# directly from @net. In the revised canonical CellChat object, @net$pval
+# stores plus-one empirical P values after condition-wide BH correction.
 fig18f[
   ,
-  raw_CellChat_probability := mapply(
+  CellChat_probability := mapply(
     function(ds, src, tgt, lr) {
       x@net[[ds]]$prob[
         as.character(src),
@@ -644,7 +653,7 @@ fig18f[
 
 fig18f[
   ,
-  raw_CellChat_p_value := mapply(
+  plus1_BH_adjusted_p_value := mapply(
     function(ds, src, tgt, lr) {
       x@net[[ds]]$pval[
         as.character(src),
@@ -661,7 +670,8 @@ fig18f[
 
 fig18f[
   ,
-  significant_p_lt_0_05 := raw_CellChat_p_value < 0.05
+  significant_plus1_BH_p_lt_0_05 :=
+    plus1_BH_adjusted_p_value < 0.05
 ]
 
 fwrite(

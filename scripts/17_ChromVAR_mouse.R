@@ -161,6 +161,9 @@ plot_raincloud <- function(df, feat, cf, tf_name, save_dir = figdir) {
   
   if (!dir.exists(save_dir)) dir.create(save_dir, recursive = TRUE)
   
+  # Descriptive per-comparison raincloud plot.
+  # Inferential annotations are added only to the master Figure 20B
+  # after BH correction across the complete 12-test family.
   p <- ggplot(df, aes(
     x = condition,
     y = .data[[feat]],
@@ -169,12 +172,6 @@ plot_raincloud <- function(df, feat, cf, tf_name, save_dir = figdir) {
     geom_half_violin(side = "l", alpha = 0.6, trim = FALSE) +
     geom_half_boxplot(side = "r", width = 0.25, alpha = 1, outlier.shape = NA) +
     geom_jitter(width = 0.1, alpha = 0.3, size = 0.7) +
-    stat_compare_means(
-      method = "wilcox.test",
-      label = "p.format",
-      size = 3,
-      comparisons = list(c(cond2, cond1))   # Veh vs EP
-    ) +
     scale_fill_manual(values=c("#1f78b4", "#e31a1c")) +
     theme_bw() +
     labs(
@@ -274,16 +271,63 @@ df_plot$condition <- factor(df_plot$condition, levels=c(cond2,cond1))  # Veh, EP
 df_plot$TF <- factor(df_plot$TF,  levels=c("ETS2","ETS1","FOS","SMAD3"))
 df_plot$FAP <- factor(df_plot$FAP, levels=fap_levels)
 
+# Wilcoxon tests for the 12 cell-type x TF comparisons.
+# Multiple testing is controlled across the complete Figure 20B
+# hypothesis family using Benjamini-Hochberg FDR.
+stats_fdr <- df_plot %>%
+  dplyr::group_by(FAP, TF) %>%
+  dplyr::summarise(
+    p_value = wilcox.test(
+      value[condition == cond2],
+      value[condition == cond1]
+    )$p.value,
+    y_max = max(value, na.rm = TRUE),
+    y_min = min(value, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  dplyr::mutate(
+    p_adj_BH = p.adjust(
+      p_value,
+      method = "BH"
+    ),
+    p_adj_significance = dplyr::case_when(
+      p_adj_BH <= 0.0001 ~ "****",
+      p_adj_BH <= 0.001  ~ "***",
+      p_adj_BH <= 0.01   ~ "**",
+      p_adj_BH <= 0.05   ~ "*",
+      TRUE               ~ "ns"
+    ),
+    y.position = y_max + 0.08 * (y_max - y_min),
+    group1 = cond2,
+    group2 = cond1
+  )
+
+if (nrow(stats_fdr) != 12L) {
+  stop(
+    "Figure 20B expected 12 cell-type x TF tests; found ",
+    nrow(stats_fdr),
+    "."
+  )
+}
+
+stats_fdr_sig <- stats_fdr %>%
+  dplyr::filter(
+    p_adj_significance != "ns"
+  )
+
 p_facet <- ggplot(df_plot, aes(x=condition, y=value, fill=condition)) +
   geom_half_violin(side="l", alpha=0.6, trim=FALSE) +
   geom_half_boxplot(side="r", width=0.25, alpha=1, outlier.shape = NA) +
   geom_jitter(width=0.1, alpha=0.25, size=0.6) +
-  stat_compare_means(
-    method="wilcox.test",
-    label="p.signif",
-    hide.ns=TRUE,
-    size=3,
-    comparisons=list(c(cond2,cond1))
+  ggpubr::stat_pvalue_manual(
+    stats_fdr_sig,
+    label = "p_adj_significance",
+    xmin = "group1",
+    xmax = "group2",
+    y.position = "y.position",
+    tip.length = 0.01,
+    size = 3,
+    inherit.aes = FALSE
   ) +
   facet_grid(TF ~ FAP, scales="free_y") +
   scale_fill_manual(values=c("#1f78b4","#e31a1c")) +

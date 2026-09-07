@@ -222,6 +222,179 @@ obj <- LinkPeaks(
   genes.use = goi
 )
 
+# -------------------------------------------------------------------------
+# Reconstruct the complete SMAD3 LinkPeaks multiple-testing family
+# -------------------------------------------------------------------------
+# LinkPeaks was run as a targeted SMAD3 analysis using the defaults:
+#   distance  = 500 kb
+#   min.cells = 10
+#
+# The multiplicity family consists of all ATAC peaks present in >10 cells
+# and located within 500 kb of the SMAD3 TSS.
+
+linkpeaks_distance_bp <- 5e5
+linkpeaks_min_cells <- 10L
+
+peak_counts_linkpeaks <- GetAssayData(
+  object = obj,
+  assay = "ATAC",
+  slot = "counts"
+)
+
+gene_data_linkpeaks <- GetAssayData(
+  object = obj,
+  assay = "SCT",
+  slot = "data"
+)
+
+if (!goi %in% rownames(gene_data_linkpeaks)) {
+  stop(
+    goi,
+    " is not present in the SCT assay."
+  )
+}
+
+peak_positive_cells <- Matrix::rowSums(
+  peak_counts_linkpeaks > 0
+)
+
+goi_positive_cells <- as.numeric(
+  Matrix::rowSums(
+    gene_data_linkpeaks[
+      goi,
+      ,
+      drop = FALSE
+    ] > 0
+  )[1]
+)
+
+if (goi_positive_cells <= linkpeaks_min_cells) {
+  stop(
+    goi,
+    " is expressed in only ",
+    goi_positive_cells,
+    " cells and would not be eligible for LinkPeaks."
+  )
+}
+
+# Signac LinkPeaks uses strictly > min.cells.
+peaks_keep_linkpeaks <-
+  peak_positive_cells > linkpeaks_min_cells
+
+n_peaks_gt_min_cells <- sum(
+  peaks_keep_linkpeaks
+)
+
+peak_ranges_linkpeaks <- granges(
+  obj[["ATAC"]]
+)
+
+peak_ranges_linkpeaks <- peak_ranges_linkpeaks[
+  peaks_keep_linkpeaks
+]
+
+annot_linkpeaks <- Annotation(
+  obj[["ATAC"]]
+)
+
+if (
+  is.null(annot_linkpeaks) ||
+  length(annot_linkpeaks) == 0L
+) {
+  stop(
+    "ATAC gene annotation is unavailable for LinkPeaks family reconstruction."
+  )
+}
+
+CollapseToLongestTranscript <- getFromNamespace(
+  "CollapseToLongestTranscript",
+  "Signac"
+)
+
+DistanceToTSS <- getFromNamespace(
+  "DistanceToTSS",
+  "Signac"
+)
+
+gene_coords_linkpeaks <- CollapseToLongestTranscript(
+  ranges = annot_linkpeaks
+)
+
+gene_coords_use <- gene_coords_linkpeaks[
+  gene_coords_linkpeaks$gene_name == goi
+]
+
+if (length(gene_coords_use) != 1L) {
+  stop(
+    "Expected exactly one collapsed coordinate entry for ",
+    goi,
+    "; found ",
+    length(gene_coords_use),
+    "."
+  )
+}
+
+peak_distance_matrix <- DistanceToTSS(
+  peaks = peak_ranges_linkpeaks,
+  genes = gene_coords_use,
+  distance = linkpeaks_distance_bp
+)
+
+if (ncol(peak_distance_matrix) != 1L) {
+  stop(
+    "Unexpected ",
+    goi,
+    " distance-matrix dimensions: ",
+    paste(
+      dim(peak_distance_matrix),
+      collapse = " x "
+    )
+  )
+}
+
+cis_keep_linkpeaks <- as.logical(
+  peak_distance_matrix[, 1]
+)
+
+n_linkpeaks_tests <- sum(
+  cis_keep_linkpeaks
+)
+
+if (n_linkpeaks_tests < 1L) {
+  stop(
+    "No eligible ",
+    goi,
+    " cis peaks were reconstructed."
+  )
+}
+
+eligible_linkpeaks_peaks <- rownames(
+  peak_distance_matrix
+)[
+  cis_keep_linkpeaks
+]
+
+# Independent C7 audit reconstructed exactly 200 eligible SMAD3 cis peaks.
+# A different value indicates that the production analysis no longer matches
+# the validated LinkPeaks test family and should be reviewed.
+if (
+  goi == "SMAD3" &&
+  n_linkpeaks_tests != 200L
+) {
+  stop(
+    "Expected 200 eligible SMAD3 LinkPeaks tests; reconstructed ",
+    n_linkpeaks_tests,
+    "."
+  )
+}
+
+message(
+  "Eligible ",
+  goi,
+  " LinkPeaks cis tests: ",
+  n_linkpeaks_tests
+)
+
 # Extract the links as a data.frame
 peak_links <- Links(obj)
 peak_links_df <- as.data.frame(peak_links) %>%
@@ -239,7 +412,14 @@ peak_links_df <- as.data.frame(peak_links) %>%
   ) %>%
   # Keep only genes in the list of interest
   dplyr::filter(target_gene %in% goi) %>%
-  dplyr::distinct()
+  dplyr::distinct() %>%
+  dplyr::mutate(
+    n_linkpeaks_tests = n_linkpeaks_tests,
+    peak_pval_bonferroni = pmin(
+      peak_pval * n_linkpeaks_tests,
+      1
+    )
+  )
 
 # Clean TF-gene network (tfnet)
 tfnet <- GetTFNetwork(obj)
@@ -451,11 +631,108 @@ tf_gene_peak_final <- tf_gene_peak_direct %>%
     p_val_adj_deg < 0.01,
     
     # Chromatin link
+    # Bonferroni correction across all eligible SMAD3 cis peaks tested
+    # in the targeted LinkPeaks analysis.
     peak_z >= 4,
-    peak_pval < 1e-5,
-    peak_score >= 0.05,
-    
+    peak_pval_bonferroni < 0.05,
+    peak_score >= 0.05
   )
+
+# -------------------------------------------------------------------------
+# Production safeguards for the corrected SMAD3 LinkPeaks framework
+# -------------------------------------------------------------------------
+
+if (nrow(tf_gene_peak_final) != 5L) {
+  stop(
+    "Expected 5 corrected high-confidence TF-gene-peak rows; found ",
+    nrow(tf_gene_peak_final),
+    "."
+  )
+}
+
+if (
+  any(is.na(tf_gene_peak_final$peak_pval_bonferroni)) ||
+  any(tf_gene_peak_final$peak_pval_bonferroni >= 0.05)
+) {
+  stop(
+    "Corrected high-confidence output contains a missing or non-significant ",
+    "Bonferroni-adjusted LinkPeaks P value."
+  )
+}
+
+if (
+  any(tf_gene_peak_final$n_linkpeaks_tests != 200L)
+) {
+  stop(
+    "Corrected high-confidence output does not consistently use the ",
+    "validated 200-peak SMAD3 LinkPeaks test family."
+  )
+}
+
+expected_highconf_keys <- c(
+  "ETS1|SMAD3|chr15-67198215-67198971",
+  "ETS2|SMAD3|chr15-67109227-67110381",
+  "ETS2|SMAD3|chr15-67198215-67198971",
+  "FOS|SMAD3|chr15-67109227-67110381",
+  "FOS|SMAD3|chr15-67106387-67107602"
+)
+
+observed_highconf_keys <- paste(
+  tf_gene_peak_final$TF,
+  tf_gene_peak_final$target_gene,
+  tf_gene_peak_final$peak_region,
+  sep = "|"
+)
+
+if (
+  !setequal(
+    observed_highconf_keys,
+    expected_highconf_keys
+  )
+) {
+  stop(
+    "Corrected high-confidence TF-gene-peak set differs from the ",
+    "independently validated C7 result."
+  )
+}
+
+# Validate the principal reported SMAD3 peak.
+reported_smad3_peak <- "chr15-67109227-67110381"
+
+reported_smad3_link <- peak_links_df %>%
+  dplyr::filter(
+    target_gene == "SMAD3",
+    peak_region == reported_smad3_peak
+  )
+
+if (nrow(reported_smad3_link) != 1L) {
+  stop(
+    "Expected exactly one reported SMAD3 LinkPeaks row for ",
+    reported_smad3_peak,
+    "; found ",
+    nrow(reported_smad3_link),
+    "."
+  )
+}
+
+expected_reported_bonf <- 3.96983310662e-05
+
+if (
+  abs(
+    reported_smad3_link$peak_pval_bonferroni -
+      expected_reported_bonf
+  ) > 1e-10
+) {
+  stop(
+    "Reported SMAD3 Bonferroni-adjusted P differs from the ",
+    "independently validated C7 result. Observed: ",
+    format(
+      reported_smad3_link$peak_pval_bonferroni,
+      scientific = TRUE,
+      digits = 12
+    )
+  )
+}
 
 wcsv(
   tf_gene_peak_final,
@@ -562,4 +839,3 @@ p9 <- FeaturePlot(obj, feature='neg_regulon_score', cols=c('lightgrey', 'seagree
 p_all <- (p1+p2+p3+p4+p5+p6+p7+p8+p9) + plot_layout(ncol = 3)
 
 save_gg(p_all, "FeaturePlot_Regulon_Scores.png", w=12, h=9)
-

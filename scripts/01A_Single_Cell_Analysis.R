@@ -758,7 +758,10 @@ s_genes <- cc.genes$s.genes
 g2m_genes <- cc.genes$g2m.genes
 obj <- CellCycleScoring(obj,g2m.features = g2m_genes, s.features = s_genes)
 
-# Visualize the distribution of cell cycle markers across
+# Visualize the distribution of cell-cycle markers across phases.
+# Seurat FindAllMarkers() calls FindMarkers() for each phase-versus-rest
+# comparison; p_val_adj is Bonferroni-adjusted across all assay features
+# within each comparison. This analysis is used for QC/visualization only.
 allm <- FindAllMarkers(obj, group.by = "Phase", only.pos = TRUE,
                        min.pct = 0.0, logfc.threshold = 0.0)
 allm <- transform(allm, dpct = pct.1 - pct.2)
@@ -1235,7 +1238,10 @@ table(Idents(obj))
 DefaultAssay(obj) <- "SCT"
 
 # ===== Finding Cluster Biomarkers =====
-# Find all markers
+# Marker testing is used for cell-type annotation and visualization.
+# Seurat FindAllMarkers() calls FindMarkers() for each cluster-versus-rest
+# comparison; p_val_adj is Bonferroni-adjusted across all assay features
+# within each comparison.
 obj_markers <- FindAllMarkers(obj, test.use="wilcox", min.pct=0.25, only.pos=TRUE)
 
 # Ordering the results
@@ -1400,109 +1406,432 @@ obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_i
 # obj <- obj %>% subset(cell_type == 'FAPs')
 
 # ========================
-# Differential expression analysis (pseudobulk with voom+limma)
+# Differential expression analysis
+# Pseudobulk RNA-seq with edgeR filtering + voom/limma
+# ========================
+#
+# Formal DE eligibility is defined at the CELL-TYPE level:
+#   - at least 3 donors per condition must contribute >=5 nuclei.
+#
+# The >=5-nuclei rule is used only to determine whether an entire cell type
+# is sufficiently represented for formal DE. Once a cell type is eligible,
+# all available donor pseudobulks for that cell type are retained in the
+# statistical model; individual low-abundance donor-celltype observations
+# are not selectively removed.
+#
+# Multiple testing:
+#   BH correction is performed separately within each cell type across all
+#   genes tested in that Aged-vs-Young contrast.
+#
+# DEG definition:
+#   BH FDR < 0.05.
+#
+# log2 fold change is retained as an effect size and is not used as a hard
+# significance threshold.
 # ========================
 
 DefaultAssay(obj) <- "RNA"
 
-run_voomlimma <- function(L) {
-  message("voomlimma")
-    dge <- DGEList(L$count, group = L$condt)
-    dge <- calcNormFactors(dge)
-    design <- model.matrix(~ L$condt) # coefficient is L$condtAged if levels = c("Young","Aged")
-    vm <- voom(dge, design = design, plot = FALSE) # set to TRUE if you want the plot
-    fit <- lmFit(vm, design = design)
-    fit <- eBayes(fit)
-    tt <- topTable(fit, n = Inf, adjust.method = "BH")
-  
-  list(tt = tt,
-       df = data.frame(pval = tt$P.Value,
-                       padj = tt$adj.P.Val,
-                       row.names = rownames(tt)))
+# -------------------------------------------------------------------------
+# 1. Donor/cell-type representation audit
+# -------------------------------------------------------------------------
+donor_celltype_nuclei <- obj@meta.data %>%
+  dplyr::transmute(
+    sample = as.character(sample),
+    condition = as.character(condition),
+    celltype = as.character(skeletal_muscle)
+  ) %>%
+  dplyr::count(
+    sample,
+    condition,
+    celltype,
+    name = "n_nuclei"
+  ) %>%
+  dplyr::arrange(
+    celltype,
+    condition,
+    sample
+  )
+
+celltype_condition_adequacy <- donor_celltype_nuclei %>%
+  dplyr::mutate(
+    donor_ge5_nuclei = n_nuclei >= 5
+  ) %>%
+  dplyr::group_by(
+    celltype,
+    condition
+  ) %>%
+  dplyr::summarise(
+    n_donors_present = dplyr::n_distinct(sample),
+    n_donors_ge5_nuclei = sum(donor_ge5_nuclei),
+    total_nuclei = sum(n_nuclei),
+    .groups = "drop"
+  )
+
+celltype_eligibility <- celltype_condition_adequacy %>%
+  dplyr::group_by(celltype) %>%
+  dplyr::summarise(
+    n_Young_donors_ge5 = sum(
+      n_donors_ge5_nuclei[condition == "Young"],
+      na.rm = TRUE
+    ),
+    n_Aged_donors_ge5 = sum(
+      n_donors_ge5_nuclei[condition == "Aged"],
+      na.rm = TRUE
+    ),
+    eligible_for_formal_DE =
+      n_Young_donors_ge5 >= 3 &
+      n_Aged_donors_ge5 >= 3,
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(celltype)
+
+eligible_celltypes <- celltype_eligibility %>%
+  dplyr::filter(eligible_for_formal_DE) %>%
+  dplyr::pull(celltype)
+
+message(
+  "Cell types eligible for formal pseudobulk DE: ",
+  paste(eligible_celltypes, collapse = ", ")
+)
+
+excluded_celltypes <- celltype_eligibility %>%
+  dplyr::filter(!eligible_for_formal_DE) %>%
+  dplyr::pull(celltype)
+
+if (length(excluded_celltypes) > 0) {
+  message(
+    "Cell types excluded from formal pseudobulk DE: ",
+    paste(excluded_celltypes, collapse = ", ")
+  )
 }
 
-# =====  Pseudobulk aggregation (counts) =====
-# Using return.seurat = FALSE to get a plain matrix for limma/edgeR
+# Keep representation/QC information with the processed DE resources.
+write.csv(
+  donor_celltype_nuclei,
+  file.path(
+    de_dir,
+    "pseudobulk_donor_celltype_nuclei.csv"
+  ),
+  row.names = FALSE
+)
+
+write.csv(
+  celltype_condition_adequacy,
+  file.path(
+    de_dir,
+    "pseudobulk_celltype_condition_adequacy.csv"
+  ),
+  row.names = FALSE
+)
+
+write.csv(
+  celltype_eligibility,
+  file.path(
+    de_dir,
+    "pseudobulk_celltype_eligibility.csv"
+  ),
+  row.names = FALSE
+)
+
+# -------------------------------------------------------------------------
+# 2. Pseudobulk aggregation
+# -------------------------------------------------------------------------
+#
+# Aggregate raw RNA counts by donor, condition, and annotated cell type.
 pb_list <- AggregateExpression(
   obj,
   assays = "RNA",
-  group.by = c("sample", "condition", "skeletal_muscle"),
+  group.by = c(
+    "sample",
+    "condition",
+    "skeletal_muscle"
+  ),
   slot = "counts",
   return.seurat = FALSE
 )
 
-# pb_counts is a genes x groups matrix (RNA assay)
 pb_counts <- pb_list$RNA
 
-# =====  Build group metadata from column names =====
-sp <- str_split_fixed(colnames(pb_counts), "_", 3)  # adjust separator if needed
-meta <- data.frame(
-  sample = sp[,1],
-  condition = factor(sp[,2], levels = c("Young","Aged")), # Young as reference
-  celltype = sp[,3],
-  stringsAsFactors = FALSE
+# AggregateExpression/Seurat may sanitize underscores in sample names
+# (e.g. Young_1 -> Young-1). The final two underscore-delimited fields are
+# condition and cell type; everything before them is the donor label.
+parse_pb_column <- function(x) {
+
+  m <- regexec(
+    "^(.*)_([^_]+)_([^_]+)$",
+    x
+  )
+
+  z <- regmatches(
+    x,
+    m
+  )[[1]]
+
+  if (length(z) != 4L) {
+    stop(
+      "Unable to parse pseudobulk column name: ",
+      x
+    )
+  }
+
+  data.frame(
+    sample = z[2],
+    condition = z[3],
+    celltype = z[4],
+    stringsAsFactors = FALSE
+  )
+}
+
+meta <- dplyr::bind_rows(
+  lapply(
+    colnames(pb_counts),
+    parse_pb_column
+  )
 )
+
 rownames(meta) <- colnames(pb_counts)
 
-# =====  Run voom+limma per cell type (Aged vs Young) =====
-subtypes <- sort(unique(meta$celltype))
+meta$condition <- factor(
+  meta$condition,
+  levels = c(
+    "Young",
+    "Aged"
+  )
+)
 
-res_list <- lapply(subtypes, function(st) {
-  message("Running voom+limma for ", st)
-  
-  # Subset columns for this cell type
-  keep_cols <- meta$celltype == st
-  counts_ct <- pb_counts[, keep_cols, drop = FALSE]
-  cond_ct <- droplevels(meta$condition[keep_cols])
-  
-  # Ensure reference level is Young (design uses ~ cond; coef will be Aged vs Young)
-  cond_ct <- relevel(cond_ct, ref = "Young")
-  
-  # (Optional) filter lowly expressed features
-  dge_tmp <- DGEList(counts_ct)
-  keep_genes <- filterByExpr(dge_tmp, group = cond_ct, min.count = 10) # conservative
-  counts_ct <- counts_ct[keep_genes, , drop = FALSE]
-  
-  # Skip if not enough samples per group
-  if (length(unique(cond_ct)) < 2 || any(table(cond_ct) < 2)) {
-    warning("Skipping ", st, " due to insufficient replicates per condition.")
-    return(NULL)
-  }
-  
-  # Run voom+limma
-  L <- list(count = counts_ct, condt = cond_ct)
-  out <- run_voomlimma(L)
-  
-  # Prepare a Seurat-like marker table layout
-  tt <- out$tt
-  tt$gene <- rownames(tt)
-  tt$celltype <- st
-  
-  # Map names to the previous pipeline for downstream compatibility
-  # limma's logFC is log2(Aged/Young) because coef is condtAged vs Young
-  tt <- tt %>%
-    transmute(
-      gene = gene,
-      p_val = round(P.Value, 4),
-      p_val_adj = round(adj.P.Val, 4),
-      avg_log2FC = round(logFC, 2),
-      celltype = celltype
-    )
-  
+if (anyNA(meta$condition)) {
+  stop(
+    "Unexpected condition label in pseudobulk metadata."
+  )
+}
+
+# -------------------------------------------------------------------------
+# 3. Voom/limma helper
+# -------------------------------------------------------------------------
+run_voomlimma <- function(
+    counts,
+    condition
+) {
+
+  condition <- droplevels(condition)
+  condition <- relevel(
+    condition,
+    ref = "Young"
+  )
+
+  dge <- edgeR::DGEList(
+    counts = counts,
+    group = condition
+  )
+
+  keep_genes <- edgeR::filterByExpr(
+    dge,
+    group = condition,
+    min.count = 10
+  )
+
+  dge <- dge[
+    keep_genes,
+    ,
+    keep.lib.sizes = FALSE
+  ]
+
+  dge <- edgeR::calcNormFactors(
+    dge
+  )
+
+  design <- model.matrix(
+    ~ condition
+  )
+
+  vm <- limma::voom(
+    dge,
+    design = design,
+    plot = FALSE
+  )
+
+  fit <- limma::lmFit(
+    vm,
+    design = design
+  )
+
+  fit <- limma::eBayes(
+    fit
+  )
+
+  # One transcriptome-wide multiple-testing family per cell-type contrast.
+  tt <- limma::topTable(
+    fit,
+    coef = "conditionAged",
+    n = Inf,
+    adjust.method = "BH",
+    sort.by = "none"
+  )
+
   tt
-})
+}
 
-# Drop NULLs (cell types with insufficient replicates)
-res_list <- Filter(Negate(is.null), res_list)
+# -------------------------------------------------------------------------
+# 4. Formal Aged-vs-Young DE within eligible cell types
+# -------------------------------------------------------------------------
+res_list <- lapply(
+  sort(eligible_celltypes),
+  function(st) {
 
-# =====  Combine and rank results =====
-bulk_de <- bind_rows(res_list) %>%
-  arrange(p_val_adj, p_val)
+    message(
+      "Running pseudobulk voom/limma for ",
+      st
+    )
 
-# Significant DE genes 
-bulk_de_sig <- bulk_de %>% filter(p_val_adj < 0.05 & avg_log2FC >= 1)
+    keep_cols <- meta$celltype == st
 
-wcsv(bulk_de_sig, file.path(de_dir, "bulk_de_sig.csv"))
-wcsv(bulk_de_sig, file.path(de_dir, "bulk_de_sig_faps.csv"))
+    counts_ct <- pb_counts[
+      ,
+      keep_cols,
+      drop = FALSE
+    ]
 
+    cond_ct <- droplevels(
+      meta$condition[
+        keep_cols
+      ]
+    )
 
+    # This should already be guaranteed by cell-type eligibility, but keep an
+    # explicit model-level safeguard.
+    if (
+      length(unique(cond_ct)) < 2L ||
+      any(table(cond_ct) < 2L)
+    ) {
+      warning(
+        "Skipping ",
+        st,
+        " due to insufficient pseudobulk replicates."
+      )
+      return(NULL)
+    }
+
+    tt <- run_voomlimma(
+      counts = counts_ct,
+      condition = cond_ct
+    )
+
+    n_by_condition <- table(cond_ct)
+
+    data.frame(
+      gene = rownames(tt),
+      celltype = st,
+      avg_log2FC = tt$logFC,
+      AveExpr = tt$AveExpr,
+      t = tt$t,
+      p_val = tt$P.Value,
+      p_val_adj = tt$adj.P.Val,
+      B = tt$B,
+      n_Young = unname(n_by_condition["Young"]),
+      n_Aged = unname(n_by_condition["Aged"]),
+      direction = ifelse(
+        tt$logFC > 0,
+        "Up",
+        ifelse(
+          tt$logFC < 0,
+          "Down",
+          "Unchanged"
+        )
+      ),
+      stringsAsFactors = FALSE,
+      row.names = NULL
+    )
+  }
+)
+
+res_list <- Filter(
+  Negate(is.null),
+  res_list
+)
+
+if (length(res_list) == 0L) {
+  stop(
+    "No cell type produced a formal pseudobulk DE result."
+  )
+}
+
+# -------------------------------------------------------------------------
+# 5. Full-precision results and significant DEG sets
+# -------------------------------------------------------------------------
+bulk_de <- dplyr::bind_rows(
+  res_list
+) %>%
+  dplyr::arrange(
+    celltype,
+    p_val_adj,
+    p_val,
+    gene
+  )
+
+# BH-FDR is the formal significance criterion.
+# log2FC is reported as an effect size but is not thresholded.
+bulk_de_sig <- bulk_de %>%
+  dplyr::filter(
+    p_val_adj < 0.05
+  ) %>%
+  dplyr::arrange(
+    celltype,
+    p_val_adj,
+    p_val,
+    gene
+  )
+
+# Formal FAP DE includes the adequately represented FAP1-FAP3 populations.
+# FAP4 is retained in the single-cell atlas and other analyses but is
+# excluded from formal pseudobulk DE by the formal representation criterion.
+bulk_de_sig_faps <- bulk_de_sig %>%
+  dplyr::filter(
+    celltype %in% c(
+      "FAP1",
+      "FAP2",
+      "FAP3"
+    )
+  )
+
+# Full tested results are retained for reproducibility and auditing.
+write.csv(
+  bulk_de,
+  file.path(
+    de_dir,
+    "bulk_de_all_tests.csv"
+  ),
+  row.names = FALSE
+)
+
+# Preserve established downstream filenames for significant results.
+write.csv(
+  bulk_de_sig,
+  file.path(
+    de_dir,
+    "bulk_de_sig.csv"
+  ),
+  row.names = FALSE
+)
+
+write.csv(
+  bulk_de_sig_faps,
+  file.path(
+    de_dir,
+    "bulk_de_sig_faps.csv"
+  ),
+  row.names = FALSE
+)
+
+message(
+  "Formal DEGs across eligible cell types: ",
+  nrow(bulk_de_sig)
+)
+
+message(
+  "Formal FAP1-FAP3 DEGs: ",
+  nrow(bulk_de_sig_faps),
+  " rows; ",
+  dplyr::n_distinct(bulk_de_sig_faps$gene),
+  " unique genes"
+)

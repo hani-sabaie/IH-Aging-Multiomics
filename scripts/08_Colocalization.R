@@ -252,8 +252,10 @@ coloc_all <- bind_rows(
   finngen_coloc
 )
 
-# PP.H4 > 0.75: colocalization criterion used in the manuscript
-coloc_sig <- coloc_all %>%
+# PP.H4 > 0.75: posterior-probability criterion for colocalization.
+# PP.H4 is a Bayesian posterior probability rather than a P value;
+# therefore frequentist multiple-testing correction is not applicable.
+coloc_supported <- coloc_all %>%
   filter(pph4 > 0.75)
 
 # -------------------------------------------------------------------------
@@ -267,13 +269,13 @@ all_file <- file.path(
 
 sig_file <- file.path(
   outdir,
-  "COLOC_all_studies_sig.csv"
+  "COLOC_all_studies_PPH4_gt_0p75.csv"
 )
 
 fwrite(coloc_all, all_file)
-fwrite(coloc_sig, sig_file)
+fwrite(coloc_supported, sig_file)
 
 cat("Total COLOC rows:", nrow(coloc_all), "\n")
-cat("PP.H4 > 0.75 rows:", nrow(coloc_sig), "\n")
+cat("PP.H4 > 0.75 rows:", nrow(coloc_supported), "\n")
 cat("All results:", all_file, "\n")
-cat("Significant results:", sig_file, "\n")
+cat("PP.H4-supported results:", sig_file, "\n")

@@ -58,15 +58,14 @@ gcta_cojo_data <- bind_rows(
 )
 
 # 2) Transform the data for visualization
+#
+# The plot displays the final jointly conditioned GCTA-COJO P values (pJ).
+# The --cojo-p 5e-5 option is the stepwise signal-selection parameter used
+# during GCTA-COJO; it is not a significance threshold for the final pJ
+# values and is therefore not drawn as a horizontal threshold.
 gcta_cojo_data <- gcta_cojo_data %>%
   mutate(
-    log_p = -log10(pJ),    # Calculate log10(p) for visualization
-    rank = rank(-log_p),  # Rank based on log(p)
-    highlight = case_when(
-      rank == 1 ~ "top1",
-      rank == 2 ~ "top2",
-      TRUE ~ "other"
-    )
+    log_p = -log10(pJ)
   )
 
 # 3) Plot the GCTA-COJO results
@@ -76,8 +75,7 @@ p_gcta_cojo <- ggplot(gcta_cojo_data, aes(x = reorder(SNP, log_p), y = log_p, fi
              fill = "white", color = "black", 
              linewidth = 0.25, size = 3, vjust = -0.2) +
   scale_fill_manual(values = c("UKB" = "#6EC7D4", "FinnGen" = "#F5D4A4")) +  # Different colors for studies
-  geom_hline(yintercept = -log10(5e-5), linetype = "dashed", color = "#d73027", linewidth = 0.6) +  # p = 5e-5 threshold
-  annotate("label", x = 2, y = -log10(5e-5) + 0.1, label = "p = 5e-5", hjust = 0.5, vjust = 0, size = 3, color = "#5b0000") +
+
   scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
   labs(title = "GCTA-COJO Results for SMAD3", x = "SNP", y = expression(-log[10](P[J]))) +
   scale_x_discrete(position = "bottom") +
@@ -93,7 +91,19 @@ p_gcta_cojo <- ggplot(gcta_cojo_data, aes(x = reorder(SNP, log_p), y = log_p, fi
 
 # 4) Save the plot
 ggsave(
-  file.path(figdir, "SMAD3_GCTA_COJO_results_with_tissue_and_study_threshold_5e-5.png"),
+  file.path(figdir, "SMAD3_GCTA_COJO_results_with_tissue_and_study.png"),
   p_gcta_cojo,
   width = 6, height = 4, dpi = 300
+)
+
+# Vector version for manuscript submission
+ggsave(
+  file.path(
+    figdir,
+    "SMAD3_GCTA_COJO_results_with_tissue_and_study.pdf"
+  ),
+  p_gcta_cojo,
+  width = 6,
+  height = 4,
+  bg = "white"
 )

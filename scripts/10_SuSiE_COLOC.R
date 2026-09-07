@@ -263,6 +263,9 @@ summary(S4)
 # ===== Colocalization with coloc.susie =====
 res <- coloc.susie(S3, S4)
 
+# PP.H4 is a Bayesian posterior probability, not a P value.
+# PP.H4 > 0.75 is used as the colocalization-support criterion;
+# frequentist multiple-testing correction is not applicable.
 res$summary[res$summary$PP.H4.abf > 0.75, ]
 colsus <- res$summary[res$summary$PP.H4.abf > 0.75, ]
 
