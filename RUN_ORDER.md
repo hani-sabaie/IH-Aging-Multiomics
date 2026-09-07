@@ -140,14 +140,30 @@ Combine the eight result sets with:
 
 `scripts/04B_Combine_SMR_Results.R`
 
-Principal combined outputs:
+Principal combined output:
 
 - `processed_results/06_SMR_HEIDI/SMR_all_studies_all_tissues.csv`
-- `processed_results/06_SMR_HEIDI/SMR_significant_all_studies_all_tissues.csv`
 
-The significant table uses the study workflow criteria
-`p_SMR < 0.05` and `p_HEIDI > 0.01`.
+Apply the revised discovery/replication multiple-testing framework with:
 
+`scripts/06C_SMR_Discovery_Replication_Audit.R`
+
+For UK Biobank discovery, Benjamini-Hochberg correction is applied jointly
+across all valid gene-tissue SMR tests from the four GTEx tissues.
+Canonical corrected discovery outputs are:
+
+- `processed_results/06_SMR_HEIDI/UKB_discovery_cohortwide_BH.csv`
+- `processed_results/06_SMR_HEIDI/UKB_discovery_cohortwide_BH_genes.csv`
+
+The exact gene-tissue hypotheses carried forward from UK Biobank are
+evaluated in FinnGen as a targeted replication family, with
+Benjamini-Hochberg correction across the two replication hypotheses:
+
+- `processed_results/06_SMR_HEIDI/targeted_FinnGen_replication.csv`
+
+HEIDI is retained as a heterogeneity diagnostic (`p_HEIDI > 0.01`) and is
+not a multiple-testing correction. The revised workflow does not use
+nominal `p_SMR < 0.05` as a downstream significance criterion.
 
 ### 2.3 Integration of candidate-gene evidence
 
@@ -159,11 +175,12 @@ Principal inputs include:
 
 - `processed_results/05_hdWGCNA/module_assignment_table.csv`
 - `processed_results/02_differential_expression/bulk_de_sig_faps.csv`
-- `processed_results/06_SMR_HEIDI/SMR_significant_all_studies_all_tissues.csv`
+- `processed_results/06_SMR_HEIDI/UKB_discovery_cohortwide_BH_genes.csv`
 
-This step integrates differential-expression, hdWGCNA, and SMR/HEIDI
-evidence and generates the candidate-gene intersection used in Figure 10.
-
+This step integrates differential-expression, hdWGCNA, and corrected UK
+Biobank SMR discovery evidence to generate the candidate-gene intersection
+used in Figure 10. FinnGen is subsequently used for targeted replication
+of the carried-forward SMR hypotheses.
 
 ### 2.4 SMAD3 locus definition
 

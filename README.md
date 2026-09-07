@@ -20,7 +20,7 @@ The repository includes scripts for:
 - Summary-data-based Mendelian randomization (SMR/HEIDI)
 - Conditional analysis (GCTA-COJO)
 - Colocalization and fine-mapping (COLOC, SuSiE)
-- Transcription factor network and motif activity (chromVAR)
+- Transcription factor network and chromVAR motif deviation score analysis
 - Cell-cell communication analysis (CellChat)
 - Mouse validation analyses
 - Spatial transcriptomics and K-cross spatial statistics
@@ -77,7 +77,7 @@ as the LD reference panel.
 Mouse single-nucleus multi-omics and spatial transcriptomic datasets were
 obtained from GEO accessions **GSE288662** and **GSE288663**.
 
-Detailed information on data acquisition and required input files will be
+Detailed information on data acquisition and required input files is
 provided in `DATA_SOURCES.md`. Third-party datasets are not redistributed
 when their original access or redistribution conditions do not permit it.
 
