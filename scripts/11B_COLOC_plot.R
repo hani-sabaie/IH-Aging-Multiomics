@@ -23,7 +23,7 @@ coloc_data <- read.csv(
     repo_root,
     "processed_results",
     "08_colocalization",
-    "COLOC_all_studies_sig.csv"
+    "COLOC_all_studies_PPH4_gt_0p75.csv"
   )
 ) %>%
   filter(gene == "SMAD3") %>%

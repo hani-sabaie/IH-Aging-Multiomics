@@ -552,13 +552,16 @@ run_coloc_susie <- function(
     coloc_res$summary
   )
 
-  coloc_sig <- coloc_summary[
+  # PP.H4 is a Bayesian posterior probability, not a P value.
+  # PP.H4 > 0.75 is used as the colocalization-support criterion;
+  # frequentist multiple-testing correction is therefore not applicable.
+  coloc_supported <- coloc_summary[
     PP.H4.abf > 0.75
   ]
 
   # Add study for combined processed output
   coloc_summary[, study := study]
-  coloc_sig[, study := study]
+  coloc_supported[, study := study]
 
   setcolorder(
     coloc_summary,
@@ -572,11 +575,11 @@ run_coloc_susie <- function(
   )
 
   setcolorder(
-    coloc_sig,
+    coloc_supported,
     c(
       "study",
       setdiff(
-        names(coloc_sig),
+        names(coloc_supported),
         "study"
       )
     )
@@ -619,10 +622,10 @@ run_coloc_susie <- function(
     SNP == smr_top_snp
   ]
 
-  # Mark significant coloc.susie hit SNPs
+  # Mark SNPs from PP.H4-supported coloc.susie components.
   hit_snps <- unique(c(
-    coloc_sig$hit1,
-    coloc_sig$hit2
+    coloc_supported$hit1,
+    coloc_supported$hit2
   ))
 
   hit_snps <- hit_snps[
@@ -662,7 +665,7 @@ run_coloc_susie <- function(
   # -----------------------------------------------------------------------
 
   fwrite(
-    coloc_sig,
+    coloc_supported,
     file.path(
       processed_dir,
       paste0(
@@ -674,13 +677,13 @@ run_coloc_susie <- function(
 
   cat(
     study,
-    "significant coloc.susie rows:",
-    nrow(coloc_sig),
+    "PP.H4-supported coloc.susie rows:",
+    nrow(coloc_supported),
     "\n"
   )
 
-  if (nrow(coloc_sig) > 0) {
-    print(coloc_sig)
+  if (nrow(coloc_supported) > 0) {
+    print(coloc_supported)
   }
 
   invisible(
@@ -688,7 +691,7 @@ run_coloc_susie <- function(
       S3 = S3,
       S4 = S4,
       coloc = coloc_res,
-      significant = coloc_sig,
+      supported = coloc_supported,
       locus_source = locus_source
     )
   )

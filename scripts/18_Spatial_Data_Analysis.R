@@ -262,8 +262,9 @@ ggsave(file.path(figdir, "Xenium_transcripts_Smad3Pos_density_4samples.png"),
        p_density_grid, width = 12, height = 8, dpi = 300)
 
 # ===== Cross-K function: Smad3 vs Pos targets (each sample) =====
-# We compute Kcross(Smad3, PosTarget) in each sample separately,
-# to test spatial attraction vs independence between TF and targets.
+# We compute Kcross(Smad3, PosTarget) in each sample separately
+# to descriptively characterize cross-type spatial association relative
+# to the theoretical Poisson expectation.
 
 for (s in sample_info$sample) {
   df_s <- tx_all %>%
@@ -464,8 +465,9 @@ for (s in sample_info$sample) {
   )
   
   # Interpretation:
-  # If Kcross(r) > theoretical pi*r^2 curve across distances r,
-  # Smad3 and its positive targets are spatially attracted at scale r.
-  # EP samples showing stronger attraction vs Veh would support
-  # treatment-specific co-localization of TF and its targets.
+  # Kcross(r) values above the theoretical pi*r^2 curve indicate stronger
+  # positive cross-type spatial association than the Poisson expectation at
+  # scale r. These curves are descriptive; no simulation envelope or formal
+  # hypothesis test is used here, so statistical significance is not inferred.
+  # Differences between EP and Veh samples are interpreted descriptively.
 }

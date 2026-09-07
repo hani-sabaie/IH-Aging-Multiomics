@@ -418,14 +418,37 @@ res_list <- lapply(subtypes, function(st) {
     tt$gene <- rownames(tt)
     tt$celltype <- st
     
+    # topTable() applies BH correction across all genes tested for this
+    # specific cell type x contrast family. Validate independently and retain
+    # full numerical precision for downstream inference.
+    bh_check <- p.adjust(
+      tt$P.Value,
+      method = "BH"
+    )
+
+    max_bh_delta <- max(
+      abs(bh_check - tt$adj.P.Val),
+      na.rm = TRUE
+    )
+
+    if (!is.finite(max_bh_delta) || max_bh_delta > 1e-12) {
+      stop(
+        "BH validation failed for ",
+        st,
+        " / ",
+        cn
+      )
+    }
+
     tt %>%
       transmute(
         gene = gene,
         celltype = celltype,
-        contrast = contrast,           # e.g. "EP_vs_Veh"
-        avg_log2FC = round(logFC,     2),
-        p_val = round(P.Value,   4),
-        p_val_adj = round(adj.P.Val, 4)
+        contrast = contrast,           # e.g. "EPR_vs_EP"
+        n_tests_within_family = nrow(tt),
+        avg_log2FC = logFC,
+        p_val = P.Value,
+        p_val_adj = adj.P.Val
       )
   })
   
@@ -442,15 +465,43 @@ res_list <- Filter(Negate(is.null), res_list)
 bulk_de <- bind_rows(res_list) %>%
   arrange(p_val_adj, p_val)
 
-# Significant DE genes (change thresholds if you like)
+# Primary significance criterion:
+# BH FDR < 0.05 within each cell type x contrast family.
+# No hard fold-change threshold is used for inferential significance.
 bulk_de_sig <- bulk_de %>%
+  filter(p_val_adj < 0.05)
+
+# Effect-size-filtered sensitivity corresponding to the historical
+# FDR < 0.05 and |log2FC| >= 1 criterion.
+bulk_de_sig_fc_sensitivity <- bulk_de %>%
   filter(p_val_adj < 0.05 & abs(avg_log2FC) >= 1)
 
 # ========================
 # Save results
 # ========================
-# All DE (all contrasts, all cell types)
-wcsv(bulk_de, file.path(processed_dir, "bulk_de_all_contrasts_mouse.csv"))
+# All DE results, retaining full numerical precision.
+fwrite(
+  bulk_de,
+  file.path(
+    processed_dir,
+    "bulk_de_all_contrasts_mouse.csv"
+  )
+)
 
-# Significant subset
-wcsv(bulk_de_sig, file.path(processed_dir, "bulk_de_sig_all_contrasts_mouse.csv"))
+# Primary FDR-only significant subset.
+fwrite(
+  bulk_de_sig,
+  file.path(
+    processed_dir,
+    "bulk_de_sig_all_contrasts_mouse.csv"
+  )
+)
+
+# Historical hard-effect-size threshold retained as a sensitivity analysis.
+fwrite(
+  bulk_de_sig_fc_sensitivity,
+  file.path(
+    processed_dir,
+    "bulk_de_sig_all_contrasts_mouse_absLog2FCge1_sensitivity.csv"
+  )
+)

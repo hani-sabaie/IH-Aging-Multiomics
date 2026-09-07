@@ -108,24 +108,14 @@ out_file <- file.path(
 
 fwrite(smr_all, out_file)
 
-# Downstream SMR/HEIDI filtering used in the manuscript
-smr_sig <- smr_all[
-  !is.na(p_SMR) &
-  !is.na(p_HEIDI) &
-  p_SMR < 0.05 &
-  p_HEIDI > 0.01
-]
-
-sig_file <- file.path(
-  smr_dir,
-  "SMR_all_studies_all_tissues_sig.csv"
-)
-
-fwrite(smr_sig, sig_file)
+# This script only combines the complete SMR/HEIDI results.
+# Statistical significance is defined downstream using the revised
+# multiple-testing framework (cohort-wide BH correction for UKB discovery,
+# followed by targeted BH correction for the carried-forward FinnGen
+# replication hypotheses). No nominal-P "significant" subset is generated
+# here.
 
 cat("Combined SMR rows:", nrow(smr_all), "\n")
 cat("Studies:", paste(unique(smr_all$study), collapse = ", "), "\n")
 cat("Tissues:", paste(unique(smr_all$tissue), collapse = " | "), "\n")
 cat("Output:", out_file, "\n")
-cat("Significant SMR/HEIDI rows:", nrow(smr_sig), "\n")
-cat("Significant output:", sig_file, "\n")
