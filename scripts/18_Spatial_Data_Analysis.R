@@ -195,7 +195,7 @@ plot_transcripts_on_image <- function(df_sample, sample_name) {
     coord_equal() +
     theme_void(base_size = 11) +
     ggtitle(paste0(sample_name,
-                   " — Smad3 network transcripts on morphology")) +
+                   " - Smad3 network transcripts on morphology")) +
     theme(legend.position = "right",
           plot.title = element_text(hjust = 0.5, size = 11))
   # Interpretation:
@@ -227,7 +227,7 @@ plot_transcripts_on_image <- function(df_sample, sample_name) {
     coord_equal() +
     theme_void(base_size = 11) +
     ggtitle(paste0(sample_name,
-                   " — density of SMAD3_Pos transcripts")) +
+                   " - density of SMAD3_Pos transcripts")) +
     theme(legend.position = "right",
           plot.title = element_text(hjust = 0.5, size = 11))
   # Interpretation:
