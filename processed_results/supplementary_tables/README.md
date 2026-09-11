@@ -1,7 +1,7 @@
 # Supplementary Tables
 
 This directory contains canonical CSV versions of Supplementary Tables
-S2-S6 assembled from the reproducible processed-result files.
+S2-S8 assembled from the reproducible processed-result files.
 
 ## Table S2
 
@@ -43,18 +43,55 @@ Rows: 3386 gene/module records.
 ## Table S5
 
 File:
-`Table_S5_SMR_HEIDI_all_studies_all_tissues.csv`
+`Table_S5_UKB_discovery_SMR_HEIDI.csv`
 
 Source:
-`processed_results/06_SMR_HEIDI/SMR_all_studies_all_tissues.csv`
+`processed_results/06_SMR_HEIDI/UKB_discovery_cohortwide_BH.csv`
 
-Rows: 58215 combined SMR/HEIDI records across the eight
-GWAS-by-tissue analyses.
+Rows: 138 UKB gene-tissue associations supported after cohort-wide
+Benjamini-Hochberg correction across the four tested GTEx tissues and
+HEIDI filtering.
+
+The UKB discovery multiple-testing family consisted of all valid
+gene-tissue SMR tests across the four GTEx tissues. Table S5 contains
+the associations retained after the corrected discovery analysis.
 
 ## Table S6
 
 File:
-`Table_S6_mouse_Smad3_pseudobulk_results.csv`
+`Table_S6_FinnGen_targeted_replication.csv`
+
+Source:
+`processed_results/06_SMR_HEIDI/targeted_FinnGen_replication.csv`
+
+Rows: 2 targeted FinnGen replication hypotheses carried forward from
+the corrected UKB discovery analysis:
+- SMAD3 in adipose subcutaneous tissue
+- PLEKHA6 in cultured fibroblasts
+
+Benjamini-Hochberg correction was applied across these two targeted
+gene-tissue-probe hypotheses. SMAD3 replicated, whereas PLEKHA6 did
+not replicate.
+
+## Table S7
+
+File:
+`Table_S7_FinnGen_all_SMR_HEIDI_results.csv`
+
+Source:
+`processed_results/06_SMR_HEIDI/SMR_all_studies_all_tissues.csv`
+(FinnGen rows across the four tested GTEx tissues).
+
+Rows: 29167 FinnGen SMR/HEIDI records.
+
+These complete FinnGen results are provided for context. Except for the two hypotheses carried forward from the UKB discovery
+analysis and summarized in Table S6, these rows were not part of the targeted
+FinnGen replication multiple-testing family.
+
+## Table S8
+
+File:
+`Table_S8_mouse_Smad3_pseudobulk_results.csv`
 
 Source:
 `processed_results/13_mouse_validation/bulk_de_all_contrasts_mouse.csv`
@@ -64,7 +101,7 @@ Rows: 30 Smad3 pseudobulk results:
 - EPR_vs_EP: 10
 - Veh_vs_EPR: 10
 
-Mouse pseudobulk differential-expression P values were adjusted using the
+Mouse pseudobulk differential-expression P-values were adjusted using the
 Benjamini-Hochberg method across all genes tested within each cell type x
 contrast family. The primary significance criterion is BH FDR < 0.05 without
 a hard fold-change threshold. The historical BH FDR < 0.05 and

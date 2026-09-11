@@ -30,10 +30,10 @@ canonical_sensitivity <- file.path(
   "bulk_de_sig_all_contrasts_mouse_absLog2FCge1_sensitivity.csv"
 )
 
-table_s6 <- file.path(
+table_s8 <- file.path(
   "processed_results",
   "supplementary_tables",
-  "Table_S6_mouse_Smad3_pseudobulk_results.csv"
+  "Table_S8_mouse_Smad3_pseudobulk_results.csv"
 )
 
 cat("===== MOUSE PSEUDOBULK CANONICAL PROMOTION =====\n")
@@ -251,14 +251,14 @@ fwrite(
 
 fwrite(
   smad3,
-  table_s6
+  table_s8
 )
 
 cat("\n===== PROMOTED OUTPUTS =====\n")
 cat("All tests:", nrow(all_new), "\n")
 cat("Primary FDR-only:", nrow(primary), "\n")
 cat("FC-filtered sensitivity:", nrow(sensitivity), "\n")
-cat("Table S6 Smad3 rows:", nrow(smad3), "\n")
+cat("Table S8 Smad3 rows:", nrow(smad3), "\n")
 cat("BH families:", nrow(family_check), "\n")
 cat(
   "Maximum independent BH delta:",
