@@ -211,7 +211,7 @@ repository.
 The processed single-cell resource was used for:
 
 - WNN-based visualization and cell annotation
-- pseudobulk SMAD3 expression analysis
+- pseudobulk Smad3 expression analysis
 - chromVAR analysis of:
   - ETS1
   - ETS2
@@ -246,10 +246,10 @@ through this repository.
 
 Spatial transcriptomic data were used to assess:
 
-- spatial localization of SMAD3 transcripts
-- spatial localization of predicted positive and negative SMAD3 targets
-- Kcross spatial association between SMAD3 and its positive targets
-- spatial density of SMAD3-positive target transcripts
+- spatial localization of Smad3 transcripts
+- spatial localization of predicted positive and negative Smad3 targets
+- Kcross spatial association between Smad3 and its positive targets
+- spatial density of Smad3-positive target transcripts
 
 Transcript-level data were filtered using:
 
