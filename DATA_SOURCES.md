@@ -302,6 +302,11 @@ Author-generated summary-level results underlying the analyses, figures, and
 tables are provided in the `processed_results/` and `source_data/`
 directories where redistribution is appropriate.
 
+Large author-generated processed R objects that serve as restart points for
+selected downstream analyses are archived separately in the companion Zenodo
+dataset (DOI: 10.5281/zenodo.22208846). These objects are documented in
+`LARGE_FILES.md` and are not stored in Git because of their size.
+
 These resources are intended to facilitate reproduction of the reported
 results without duplicating restricted or externally maintained datasets.
 

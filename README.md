@@ -91,6 +91,12 @@ workflows described in the manuscript and provides explicit documentation
 of data acquisition, software dependencies, analysis execution order, and
 author-generated processed results underlying the reported analyses.
 
+Large author-generated processed R objects used as checkpoints for selected
+downstream analyses are archived separately in a companion Zenodo dataset
+(DOI: 10.5281/zenodo.22208846). These objects are not stored in Git because
+of their size. See `LARGE_FILES.md` for the complete inventory and archive
+details.
+
 Third-party datasets and resources subject to access or redistribution
 restrictions are not redistributed through this repository.
 

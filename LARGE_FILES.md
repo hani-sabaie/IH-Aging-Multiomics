@@ -4,12 +4,14 @@ Large serialized R objects generated during the analysis are intentionally
 excluded from Git because individual files are approximately 3–6 GB.
 
 The repository contains the complete analysis scripts and compact processed
-results/source data. Selected large checkpoint objects will be archived
-separately with the project data release so that users can restart major
-downstream analysis stages without recomputing the entire single-cell
-multi-omics workflow.
+results/source data. Selected large checkpoint objects are archived separately
+in a companion Zenodo dataset so that users can restart major downstream
+analysis stages without recomputing the entire single-cell multi-omics
+workflow.
 
-## Objects selected for external archival
+Companion dataset DOI: 10.5281/zenodo.22208846
+
+## Archived objects
 
 | File | Approx. size | Role | Archive |
 |---|---:|---|---|
@@ -23,9 +25,10 @@ multi-omics workflow.
 
 Approximate total size: **25.219 GiB**.
 
-These files are not committed to Git. Their public archive location and
-persistent identifier will be added after creation of the project data
-release.
+These files are not committed to Git. They are distributed through the
+companion Zenodo dataset:
+
+DOI: 10.5281/zenodo.22208846
 
 ## Intermediate checkpoints not selected for archival
 
@@ -51,7 +54,14 @@ input datasets described in `DATA_SOURCES.md`. Third-party raw/source data
 remain subject to the access and redistribution terms of their original
 repositories and providers.
 
+The stored Signac Fragment objects retain references to the original local
+fragment-file paths, file hashes, and cell-barcode mappings; the fragment
+files themselves are not embedded in the archived R objects. Users who obtain
+the fragment files from the original data providers can update these paths
+using `Signac::UpdatePath()`.
+
 ## Integrity
 
-File sizes and SHA-256 checksums will be recorded immediately before the
-external data release so that archived files can be verified after download.
+The companion Zenodo dataset includes a `manifest.csv` file containing the
+exact byte size and SHA-256 checksum for each multipart archive file, allowing
+downloaded files to be verified before extraction.
