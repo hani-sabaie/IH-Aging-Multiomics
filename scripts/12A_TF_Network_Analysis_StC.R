@@ -192,7 +192,7 @@ wcsv(dregs, file.path(processed_dir, "differential_regulons.csv"))
 # show the table
 head(dregs)
 
-# Use the dregs which we obtained above
+# Use the differential regulon results generated above
 p <- PlotDifferentialRegulons(obj, dregs)
 
 # Show the plot
@@ -205,7 +205,7 @@ save_gg(p + theme(panel.background = element_rect(fill = 'white')),
 # Provide the gene list
 goi <- "SMAD3"
 
-# Make sure we are on ATAC assay
+# Set the ATAC assay as active
 DefaultAssay(obj) <- "ATAC"
 
 # Add peak stats (GC etc.)
@@ -374,7 +374,7 @@ eligible_linkpeaks_peaks <- rownames(
   cis_keep_linkpeaks
 ]
 
-# Independent C7 audit reconstructed exactly 200 eligible SMAD3 cis peaks.
+# Independent validation reconstructed exactly 200 eligible SMAD3 cis peaks.
 # A different value indicates that the production analysis no longer matches
 # the validated LinkPeaks test family and should be reviewed.
 if (
@@ -478,7 +478,7 @@ tf_targets_sig <- tfnet_clean %>%
   dplyr::filter(target_gene %in% goi) %>%
   dplyr::distinct()
 
-# Make sure ATAC assay is active
+# Ensure the ATAC assay is active
 DefaultAssay(obj) <- "ATAC"
 
 # Add motifs 
@@ -692,7 +692,7 @@ if (
 ) {
   stop(
     "Corrected high-confidence TF-gene-peak set differs from the ",
-    "independently validated C7 result."
+    "independently validated result."
   )
 }
 
@@ -725,7 +725,7 @@ if (
 ) {
   stop(
     "Reported SMAD3 Bonferroni-adjusted P differs from the ",
-    "independently validated C7 result. Observed: ",
+    "independently validated result. Observed: ",
     format(
       reported_smad3_link$peak_pval_bonferroni,
       scientific = TRUE,

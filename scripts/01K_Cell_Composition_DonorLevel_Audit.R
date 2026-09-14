@@ -31,7 +31,11 @@ repo_root <- normalizePath(".")
 
 obj_file <- Sys.getenv(
   "CELLPROP_SEURAT_RDS",
-  unset = "F:/Hani's Files/Hernia/outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
+  unset = file.path(
+    repo_root,
+    "outputs",
+    "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
+  )
 )
 
 audit_dir <- file.path(

@@ -368,5 +368,3 @@ df_change <- df_summary %>%
       TRUE        ~ "No change"
     )
   )
-
-View(df_change)

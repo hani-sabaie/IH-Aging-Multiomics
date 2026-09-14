@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 audit
+# CellChat TGF-beta nboot=1000 validation
 # Lightweight TGFb CellChat rerun with nboot = 1000.
 #
 # Purpose:

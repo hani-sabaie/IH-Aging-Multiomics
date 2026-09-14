@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7
+# Promote validated CellChat results to canonical outputs
 # Promote the fully validated corrected CellChat object and Figure 18
 # source-data resources to canonical repository locations.
 #
@@ -42,12 +42,12 @@ audit_root <- file.path(
 
 candidate_root <- file.path(
   audit_root,
-  "figure18ABC_corrected_candidate"
+  "figure18ABC_validation"
 )
 
 candidate_obj <- file.path(
   candidate_root,
-  "cellchat_merged_full18_nboot1000_plus1BH_corrected_candidate.rds"
+  "cellchat_merged_full18_nboot1000_plus1BH_validation.rds"
 )
 
 candidate_source_dir <- file.path(
@@ -227,7 +227,7 @@ for (i in seq_along(source_files)) {
   )
 }
 
-# Figure18F revised inferential semantics must be explicit.
+# Figure18F inferential semantics must be explicit.
 fig18f <- fread(
   file.path(
     candidate_source_dir,
@@ -248,7 +248,7 @@ missing_f_cols <- setdiff(
 
 if (length(missing_f_cols) > 0L) {
   stop(
-    "Corrected Figure18F source data is missing revised columns: ",
+    "Figure18F source data is missing required columns: ",
     paste(
       missing_f_cols,
       collapse = ", "

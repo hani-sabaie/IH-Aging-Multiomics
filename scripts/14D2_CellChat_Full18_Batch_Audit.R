@@ -1,9 +1,9 @@
 # ============================================================================
-# Reviewer C7 audit:
+# Full 18-pathway CellChat batch audit:
 # Batched nboot=1000 rerun of the historical 18-pathway CellChat LR family.
 #
 # Usage:
-#   Rscript scripts/14C7A_CellChat_Full18_Batch_Audit.R Young 1 25
+#   Rscript scripts/14D2_CellChat_Full18_Batch_Audit.R Young 1 25
 #
 # Each batch:
 #   - uses the exact historical condition-specific LR family

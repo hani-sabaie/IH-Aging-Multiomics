@@ -43,9 +43,11 @@ repo_root <- normalizePath(".")
 
 obj_file <- Sys.getenv(
   "MOUSE_SEURAT_RDS",
-  unset = paste0(
-    "C:/Users/Hani/Desktop/Hernia/data/GSE288662/",
-    "Processed_Seurat_Object/",
+  unset = file.path(
+    repo_root,
+    "data",
+    "GSE288662",
+    "Processed_Seurat_Object",
     "GSE288662_Processed_Seurat_Object.rds"
   )
 )

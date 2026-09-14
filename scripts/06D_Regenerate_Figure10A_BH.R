@@ -1,7 +1,7 @@
-# Reviewer C7
+# Figure 10A multiple-testing-aware regeneration
 # Regenerate Figure 10A using BH-corrected UKB SMR discovery results.
 #
-# This is an audit/revision script.
+# This script validates and regenerates Figure 10A.
 # It does NOT overwrite the current canonical Figure 10A.
 
 rm(list = ls(all.names = TRUE))
@@ -95,7 +95,7 @@ deg_genes <- unique(
   na.omit(deg$gene)
 )
 
-# Primary corrected UKB discovery definition:
+# Primary BH-adjusted UKB discovery definition:
 # BH across all UKB gene-tissue tests + HEIDI criterion
 smr_ukb_bh_genes <- unique(
   na.omit(
@@ -195,7 +195,7 @@ ggsave(
 )
 
 # -------------------------------------------------------------------------
-# Revised Figure 10A source-data table
+# Figure 10A source-data table
 # -------------------------------------------------------------------------
 
 all_genes <- sort(unique(c(

@@ -9,7 +9,7 @@ and statistical genetics to identify key regulatory mechanisms linked to aging.
 
 ---
 
-## 🔬 Overview of Analyses
+## Overview of Analyses
 
 The repository includes scripts for:
 
@@ -27,7 +27,7 @@ The repository includes scripts for:
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 Scripts are organized by analytical step under the `scripts/` directory and
 are numbered to reflect execution order.
@@ -36,7 +36,7 @@ No individual-level or raw sequencing data are included in this repository.
 
 ---
 
-## 🧪 Data Sources
+## Data Sources
 
 The analyses in this study use data obtained from the original repositories
 and data providers described below.
@@ -83,7 +83,7 @@ when their original access or redistribution conditions do not permit it.
 
 ---
 
-## ▶️ Reproducibility
+## Reproducibility
 
 Analyses were conducted using R (v4.5.2) together with command-line tools.
 The repository contains the analysis scripts used for the computational

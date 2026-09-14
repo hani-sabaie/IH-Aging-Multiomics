@@ -109,7 +109,7 @@ out_file <- file.path(
 fwrite(smr_all, out_file)
 
 # This script only combines the complete SMR/HEIDI results.
-# Statistical significance is defined downstream using the revised
+# Statistical significance is defined downstream using the current
 # multiple-testing framework (cohort-wide BH correction for UKB discovery,
 # followed by targeted BH correction for the carried-forward FinnGen
 # replication hypotheses). No nominal-P "significant" subset is generated

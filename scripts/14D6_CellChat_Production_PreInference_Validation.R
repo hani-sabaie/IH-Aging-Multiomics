@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 production preflight
+# CellChat production pre-inference validation
 #
 # Validate that the production CellChat preprocessing stage, starting from
 # the Seurat object, reproduces the exact historical signaling matrix and

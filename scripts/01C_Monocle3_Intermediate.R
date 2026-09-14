@@ -88,7 +88,7 @@ keep_young <- colnames(cds_fap)[
 
 cds_young <- cds_fap[, keep_young]
 
-# Quick sanity check
+# Basic trajectory validation
 table(colData(cds_young)$cluster_fap, colData(cds_young)$condition)
 
 # Cluster cells on the UMAP embedding

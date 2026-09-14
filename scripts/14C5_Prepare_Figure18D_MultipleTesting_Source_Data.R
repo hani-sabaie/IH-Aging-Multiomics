@@ -46,7 +46,7 @@ candidate_dir <- file.path(
   "processed_results",
   "12_CellChat",
   "multiple_testing_audit",
-  "figure18_revised_candidate"
+  "figure18_validation"
 )
 
 dir.create(
@@ -285,7 +285,7 @@ fwrite(
   candidate_core,
   file.path(
     candidate_dir,
-    "Figure18D_TGFb_pathway_network_corrected_candidate.csv"
+    "Figure18D_TGFb_pathway_network_validation.csv"
   )
 )
 

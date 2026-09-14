@@ -1,11 +1,11 @@
 # ============================================================================
-# Reviewer C7
-# Revised-candidate Figure 10A-C
+# Figure 10A-C validation workflow
+# Validation Figure 10A-C
 #
 # Figure 10A:
 #   Discovery-stage integration using:
 #     - Yellow / Brown / Blue hdWGCNA modules
-#     - revised FAP pseudobulk DEGs (BH-FDR < 0.05; FAP1-FAP3)
+#     - FAP pseudobulk DEGs (BH-FDR < 0.05; FAP1-FAP3)
 #     - UKB SMR significant after cohort-wide BH + HEIDI
 #
 # Figure 10B:
@@ -65,7 +65,7 @@ deg_file <- file.path(
   repo_root,
   "processed_results",
   "02_differential_expression",
-  "revised_candidate",
+  "validation",
   "DEGs_FAP_BH_FDR005.csv"
 )
 
@@ -120,8 +120,8 @@ if (length(missing_files)) {
 figdir <- file.path(
   repo_root,
   "outputs",
-  "reviewer_c7",
-  "Figure10_revised_candidate"
+  "validation",
+  "Figure10_validation"
 )
 
 srcdir <- file.path(
@@ -129,7 +129,7 @@ srcdir <- file.path(
   "processed_results",
   "06_SMR_HEIDI",
   "multiple_testing_audit",
-  "figure10_revised_candidate"
+  "figure10_validation"
 )
 
 dir.create(figdir, recursive = TRUE, showWarnings = FALSE)
@@ -170,13 +170,13 @@ check_cols <- function(x, req, label) {
 }
 
 check_cols(modules, required_module_cols, "Module table")
-check_cols(deg, required_deg_cols, "Revised DEG table")
+check_cols(deg, required_deg_cols, "FAP DEG table")
 check_cols(ukb, required_smr_cols, "UKB SMR table")
 check_cols(fin, required_smr_cols, "FinnGen SMR table")
 check_cols(rep_all, required_rep_cols, "Replication table")
 
 # ============================================================================
-# Figure 10A: revised discovery-stage integration
+# Figure 10A: discovery-stage integration
 # ============================================================================
 
 yellow_genes <- sort(unique(
@@ -193,15 +193,15 @@ blue_genes <- sort(unique(
 
 deg_genes <- sort(unique(na.omit(deg$gene)))
 
-# Revision validation
+# Validation
 if (length(deg_genes) != 194L) {
   warning(
-    "Expected 194 unique revised FAP genes, but found ",
+    "Expected 194 unique FAP genes, but found ",
     length(deg_genes)
   )
 }
 
-# Corrected UKB discovery rows:
+# BH-adjusted UKB discovery rows:
 # cohort-wide BH across UKB gene-tissue tests + HEIDI criterion
 ukb_discovery_rows <- ukb[
   !is.na(FDR_cohortwide) &
@@ -278,7 +278,7 @@ setorder(
 )
 
 cat("\n============================================================\n")
-cat("FIGURE 10A — REVISED UKB DISCOVERY\n")
+cat("FIGURE 10A — UKB DISCOVERY\n")
 cat("============================================================\n\n")
 
 cat("Yellow module :", length(yellow_genes), "\n")
@@ -359,7 +359,7 @@ p10a <- plot_upset(
 )
 
 ggsave(
-  file.path(figdir, "Figure10A_revised_candidate.png"),
+  file.path(figdir, "Figure10A_validation.png"),
   p10a,
   width = 8,
   height = 5,
@@ -369,7 +369,7 @@ ggsave(
 )
 
 ggsave(
-  file.path(figdir, "Figure10A_revised_candidate.pdf"),
+  file.path(figdir, "Figure10A_validation.pdf"),
   p10a,
   width = 8,
   height = 5,
@@ -399,17 +399,17 @@ fwrite(
 
 fwrite(
   ukb_discovery_rows,
-  file.path(srcdir, "Figure10A_UKB_corrected_discovery_rows.tsv"),
+  file.path(srcdir, "Figure10A_UKB_BH_adjusted_discovery_rows.tsv"),
   sep = "\t"
 )
 
 # ============================================================================
-# Select PRIMARY revised discovery/replication framework
+# Select primary discovery/replication framework
 # ============================================================================
 #
 # In 01G this was originally labelled as a sensitivity framework.
-# Here we retain the original label for provenance but explicitly annotate
-# its intended revised role rather than silently changing historical output.
+# Retain the original label for provenance and explicitly annotate
+# its intended validation role rather than silently changing historical output.
 # ============================================================================
 
 rep_primary <- rep_all[
@@ -422,8 +422,8 @@ if (nrow(rep_primary) == 0L) {
 
 rep_primary[
   ,
-  revised_analysis_role :=
-    "Revised primary: within-cell-type BH-FDR < 0.05; no hard fold-change cutoff"
+  analysis_role :=
+    "Primary: within-cell-type BH-FDR < 0.05; no hard fold-change cutoff"
 ]
 
 rep_hypotheses <- unique(
@@ -864,7 +864,7 @@ p10b <- make_smr_heidi_plot(
 )
 
 ggsave(
-  file.path(figdir, "Figure10B_UKB_SMAD3_revised_candidate.png"),
+  file.path(figdir, "Figure10B_UKB_SMAD3_validation.png"),
   p10b,
   width = 6,
   height = 5,
@@ -873,7 +873,7 @@ ggsave(
 )
 
 ggsave(
-  file.path(figdir, "Figure10B_UKB_SMAD3_revised_candidate.pdf"),
+  file.path(figdir, "Figure10B_UKB_SMAD3_validation.pdf"),
   p10b,
   width = 6,
   height = 5,
@@ -984,7 +984,7 @@ p10c <- make_smr_heidi_plot(
 )
 
 ggsave(
-  file.path(figdir, "Figure10C_FinnGen_SMAD3_revised_candidate.png"),
+  file.path(figdir, "Figure10C_FinnGen_SMAD3_validation.png"),
   p10c,
   width = 6,
   height = 5,
@@ -993,7 +993,7 @@ ggsave(
 )
 
 ggsave(
-  file.path(figdir, "Figure10C_FinnGen_SMAD3_revised_candidate.pdf"),
+  file.path(figdir, "Figure10C_FinnGen_SMAD3_validation.pdf"),
   p10c,
   width = 6,
   height = 5,
@@ -1012,7 +1012,7 @@ fwrite(
 p10bc <- p10b | p10c
 
 ggsave(
-  file.path(figdir, "Figure10BC_revised_candidate_preview.png"),
+  file.path(figdir, "Figure10BC_validation_preview.png"),
   p10bc,
   width = 12,
   height = 5,
@@ -1021,7 +1021,7 @@ ggsave(
 )
 
 ggsave(
-  file.path(figdir, "Figure10BC_revised_candidate_preview.pdf"),
+  file.path(figdir, "Figure10BC_validation_preview.pdf"),
   p10bc,
   width = 12,
   height = 5,
@@ -1078,4 +1078,4 @@ cat("============================================================\n\n")
 cat("Figures:\n", figdir, "\n")
 cat("Source data:\n", srcdir, "\n")
 
-cat("\nNo canonical manuscript figure was overwritten.\n")
+cat("\nCanonical figure outputs were not overwritten.\n")

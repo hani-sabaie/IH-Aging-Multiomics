@@ -2,7 +2,7 @@
 # Production update of canonical SMAD3 LinkPeaks downstream resources
 #
 # Purpose:
-#   Materialize the reviewer-C7 multiple-testing correction in the canonical
+#   Materialize the validated multiple-testing correction in the canonical
 #   TF-network tables without rerunning the computationally expensive upstream
 #   TF-network / motif pipeline.
 #
@@ -366,7 +366,7 @@ if (
 ) {
   stop(
     "Corrected high-confidence key set differs from the ",
-    "independently validated C7 result."
+    "independently validated result."
   )
 }
 

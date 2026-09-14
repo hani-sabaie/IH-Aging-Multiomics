@@ -87,7 +87,7 @@ enableWGCNAThreads(nThreads = 8)
 # ========================
 obj <- readRDS(input_obj_file)
 
-# Subset just one cell type 
+# Subset the target cell type
 obj <- obj %>% subset(cell_type == 'FAPs')
 table(obj$skeletal_muscle)
 with(obj@meta.data, table(sample, skeletal_muscle))

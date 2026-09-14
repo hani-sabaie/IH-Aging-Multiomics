@@ -1,5 +1,5 @@
 # ============================================================================
-# Targeted audit: why did Smad3 Type IIa FDR change?
+# Targeted validation of the Smad3 Type IIa FDR change
 #
 # Compares:
 #   A) correct metadata, EP + Veh + EPR
@@ -20,9 +20,13 @@ suppressPackageStartupMessages({
   library(limma)
 })
 
-obj_file <- paste0(
-  "C:/Users/Hani/Desktop/Hernia/data/GSE288662/",
-  "Processed_Seurat_Object/",
+repo_root <- normalizePath(".")
+
+obj_file <- file.path(
+  repo_root,
+  "data",
+  "GSE288662",
+  "Processed_Seurat_Object",
   "GSE288662_Processed_Seurat_Object.rds"
 )
 
@@ -86,7 +90,7 @@ md$sample <- as.character(md$sample)
 md$condition <- as.character(md$condition)
 
 # --------------------------------------------------------------------------
-# Show historical parser behavior.
+# Validate historical parser behavior.
 # --------------------------------------------------------------------------
 
 sample_design <- unique(

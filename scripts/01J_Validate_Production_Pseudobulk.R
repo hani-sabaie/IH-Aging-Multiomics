@@ -1,8 +1,8 @@
 # ============================================================================
-# Validate the revised production pseudobulk logic before canonicalization.
+# Validate the production pseudobulk logic before canonicalization.
 #
 # This independently reproduces the pseudobulk block now implemented in 01A
-# and compares it against the previously validated 01I revised-candidate
+# and compares it against the previously validated 01I full-precision output
 # results.
 #
 # No canonical processed result is modified.
@@ -46,8 +46,7 @@ obj_candidates <- c(
     repo_root,
     "outputs",
     "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
-  ),
-  "F:/Hani's Files/Hernia/outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
+  )
 )
 
 obj_hits <- obj_candidates[
@@ -71,7 +70,7 @@ candidate_dir <- file.path(
   repo_root,
   "processed_results",
   "02_differential_expression",
-  "revised_candidate"
+  "validation"
 )
 
 candidate_all_file <- file.path(
@@ -247,7 +246,7 @@ rm(obj)
 gc()
 
 # --------------------------------------------------------------------------
-# 3. Parse pseudobulk column metadata exactly as revised 01A
+# 3. Parse pseudobulk column metadata exactly as implemented in 01A
 # --------------------------------------------------------------------------
 parse_pb_column <- function(x) {
 

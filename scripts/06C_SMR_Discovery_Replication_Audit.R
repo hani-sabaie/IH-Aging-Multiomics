@@ -1,4 +1,4 @@
-# Reviewer C7
+# SMR discovery-replication validation
 # SMR discovery-replication multiple-testing audit
 #
 # Evaluates:

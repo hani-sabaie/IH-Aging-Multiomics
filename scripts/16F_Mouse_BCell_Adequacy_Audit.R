@@ -26,9 +26,13 @@ suppressPackageStartupMessages({
   library(data.table)
 })
 
-obj_file <- paste0(
-  "C:/Users/Hani/Desktop/Hernia/data/GSE288662/",
-  "Processed_Seurat_Object/",
+repo_root <- normalizePath(".")
+
+obj_file <- file.path(
+  repo_root,
+  "data",
+  "GSE288662",
+  "Processed_Seurat_Object",
   "GSE288662_Processed_Seurat_Object.rds"
 )
 

@@ -1,4 +1,4 @@
-# Reviewer C7: multiple-testing audit for SMR results
+# Multiple-testing audit for SMR results
 # Applies Benjamini-Hochberg correction separately within each
 # GWAS x GTEx tissue SMR analysis.
 #

@@ -1,5 +1,5 @@
 # ============================================================================
-# Revised human pseudobulk differential-expression candidate pipeline
+# Full-precision human pseudobulk differential-expression validation pipeline
 #
 # Purpose:
 #   - Re-run pseudobulk DE directly from the annotated human Seurat object
@@ -9,7 +9,7 @@
 #   - Define primary DEGs by BH-FDR < 0.05 (no hard fold-change threshold)
 #
 # IMPORTANT:
-#   This script writes only to a revision-candidate directory.
+#   This script writes only to a validation directory.
 #   It does NOT overwrite current canonical outputs.
 # ============================================================================
 
@@ -35,7 +35,7 @@ rds_file <- args[1]
 outdir <- file.path(
   "processed_results",
   "02_differential_expression",
-  "revised_candidate"
+  "validation"
 )
 
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
@@ -515,7 +515,7 @@ if (file.exists(audit_file)) {
 }
 
 # ============================================================================
-# 7. Write revision-candidate outputs
+# 7. Write validation outputs
 # ============================================================================
 
 fwrite(

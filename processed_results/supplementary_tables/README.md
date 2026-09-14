@@ -28,7 +28,7 @@ Table S3 is exactly the FAP1-FAP3 subset of Table S2:
 - FAP2: 3
 - FAP3: 114
 
-FAP4 is excluded from formal pseudobulk differential-expression testing because it does not meet the donor-representation criterion used for the revised analysis.
+FAP4 is excluded from formal pseudobulk differential-expression testing because it does not meet the donor-representation criterion used for the primary analysis.
 
 ## Table S4
 
@@ -65,7 +65,7 @@ Source:
 `processed_results/06_SMR_HEIDI/targeted_FinnGen_replication.csv`
 
 Rows: 2 targeted FinnGen replication hypotheses carried forward from
-the corrected UKB discovery analysis:
+the BH-adjusted UKB discovery analysis:
 - SMAD3 in adipose subcutaneous tissue
 - PLEKHA6 in cultured fibroblasts
 
@@ -82,7 +82,7 @@ Source:
 `processed_results/06_SMR_HEIDI/SMR_all_studies_all_tissues.csv`
 (FinnGen rows across the four tested GTEx tissues).
 
-Rows: 29167 FinnGen SMR/HEIDI records.
+Rows: 29151 FinnGen SMR/HEIDI records.
 
 These complete FinnGen results are provided for context. Except for the two hypotheses carried forward from the UKB discovery
 analysis and summarized in Table S6, these rows were not part of the targeted

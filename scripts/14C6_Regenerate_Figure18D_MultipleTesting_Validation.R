@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7
+# Figure 18D multiple-testing-aware regeneration
 # Regenerate Figure 18D candidate using multiplicity-corrected TGFb
 # communications.
 #
@@ -68,15 +68,15 @@ candidate_source_file <- file.path(
   "processed_results",
   "12_CellChat",
   "multiple_testing_audit",
-  "figure18_revised_candidate",
-  "Figure18D_TGFb_pathway_network_corrected_candidate.csv"
+  "figure18_validation",
+  "Figure18D_TGFb_pathway_network_validation.csv"
 )
 
 figdir <- file.path(
   repo_root,
   "outputs",
-  "reviewer_c7",
-  "Figure18_revised_candidate"
+  "validation",
+  "Figure18_validation"
 )
 
 dir.create(
@@ -233,7 +233,7 @@ make_corrected_plot_object <- function(ds) {
     prob_arr[src, tgt, lr] <-
       z$probability[i]
 
-    # This is the inferential quantity used by the revised plot.
+    # This is the inferential quantity used by the multiple-testing-aware plot.
     pval_arr[src, tgt, lr] <-
       z$p_plus1_BH_TGFb[i]
   }
@@ -420,13 +420,13 @@ plot_one <- function(
 plot_one(
   young_cc,
   "Young",
-  "Figure18D_TGFb_Young_corrected_candidate"
+  "Figure18D_TGFb_Young_validation"
 )
 
 plot_one(
   aged_cc,
   "Aged",
-  "Figure18D_TGFb_Aged_corrected_candidate"
+  "Figure18D_TGFb_Aged_validation"
 )
 
 # --------------------------------------------------------------------------
@@ -472,7 +472,7 @@ fwrite(
   validation,
   file.path(
     figdir,
-    "Figure18D_corrected_candidate_validation.tsv"
+    "Figure18D_validation_summary.tsv"
   ),
   sep = "\t"
 )

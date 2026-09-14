@@ -4,7 +4,7 @@
 # Figure 10A:
 #   Discovery-stage integration using:
 #     - Yellow / Brown / Blue hdWGCNA modules
-#     - canonical revised FAP pseudobulk DEGs
+#     - canonical FAP pseudobulk DEGs
 #       (BH-FDR < 0.05; FAP1-FAP3)
 #     - UKB SMR significant after cohort-wide BH + HEIDI
 #
@@ -15,12 +15,12 @@
 #
 # Figure 10C:
 #   Targeted FinnGen replication of the exact hypotheses carried forward
-#   from corrected UKB discovery.
+#   from BH-adjusted UKB discovery.
 #   BH correction is applied across the carried-forward hypotheses and
 #   HEIDI P > 0.01 is additionally required.
 #
 # All inferential inputs are reconstructed directly from canonical
-# processed-result resources. No reviewer-audit result is required.
+# processed-result resources.
 # ============================================================================
 
 rm(list = ls(all.names = TRUE))
@@ -182,7 +182,7 @@ check_cols(
 check_cols(
   deg,
   required_deg_cols,
-  "Canonical revised DEG table"
+  "Canonical DEG table"
 )
 
 check_cols(
@@ -263,7 +263,7 @@ fin <- prepare_cohort(
 )
 
 # ============================================================================
-# Figure 10A: revised discovery-stage integration
+# Figure 10A: discovery-stage integration
 # ============================================================================
 
 yellow_genes <- sort(unique(
@@ -280,15 +280,15 @@ blue_genes <- sort(unique(
 
 deg_genes <- sort(unique(na.omit(deg$gene)))
 
-# Revision validation
+# Validation
 if (length(deg_genes) != 194L) {
   warning(
-    "Expected 194 unique revised FAP genes, but found ",
+    "Expected 194 unique FAP genes, but found ",
     length(deg_genes)
   )
 }
 
-# Corrected UKB discovery rows:
+# BH-adjusted UKB discovery rows:
 # cohort-wide BH across UKB gene-tissue tests + HEIDI criterion
 ukb_discovery_rows <- ukb[
   !is.na(FDR_cohortwide) &
@@ -486,7 +486,7 @@ fwrite(
 
 fwrite(
   ukb_discovery_rows,
-  file.path(srcdir, "Figure10A_UKB_corrected_discovery_rows.tsv"),
+  file.path(srcdir, "Figure10A_UKB_BH_adjusted_discovery_rows.tsv"),
   sep = "\t"
 )
 
@@ -589,12 +589,12 @@ rep_primary[
 rep_primary[
   ,
   framework :=
-    "Targeted FinnGen replication of corrected UKB discovery"
+    "Targeted FinnGen replication of BH-adjusted UKB discovery"
 ]
 
 rep_primary[
   ,
-  revised_analysis_role :=
+  analysis_role :=
     paste0(
       "Primary: UKB cohort-wide BH-FDR < 0.05 + HEIDI; ",
       "FinnGen targeted BH replication + HEIDI"
@@ -606,7 +606,7 @@ setorder(
   Gene
 )
 
-# Exact safeguards established in the independent C7 validation.
+# Exact safeguards established in the independent validation.
 smad3_rep_check <- rep_primary[
   Gene == "SMAD3"
 ]

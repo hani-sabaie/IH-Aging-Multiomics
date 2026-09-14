@@ -26,16 +26,16 @@ cojo_dir <- file.path(
 
 ukb_file <- file.path(
   cojo_dir,
-  "UKB_SMAD3_GCTA_corrected.jma.cojo"
+  "UKB_SMAD3_GCTA.jma.cojo"
 )
 
 finngen_file <- file.path(
   cojo_dir,
-  "Finn_SMAD3_GCTA_corrected.jma.cojo"
+  "Finn_SMAD3_GCTA.jma.cojo"
 )
 
 if (!file.exists(ukb_file) || !file.exists(finngen_file)) {
-  stop("Corrected GCTA-COJO .jma.cojo files not found.")
+  stop("GCTA-COJO .jma.cojo files not found.")
 }
 
 ukb_cojo <- read.table(
@@ -96,7 +96,7 @@ ggsave(
   width = 6, height = 4, dpi = 300
 )
 
-# Vector version for manuscript submission
+# Vector output for publication-quality figures
 ggsave(
   file.path(
     figdir,

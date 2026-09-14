@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 / reproducibility audit
+# Pseudobulk differential-expression reproducibility audit
 # Human pseudobulk DE full-precision reconstruction
 #
 # Goals:

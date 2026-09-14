@@ -265,7 +265,6 @@ save_gg(f, "Clusters_with_annotation.png", w=11, h=5)
 # Load the object
 # ========================
 obj <- readRDS(mouse_obj_file)
-# obj1 <- obj %>% subset(type == 'FAPs')
 
 # ========================
 # Differential expression analysis (pseudobulk with voom+limma)
@@ -387,7 +386,7 @@ res_list <- lapply(subtypes, function(st) {
   counts_ct <- counts_ct[, valid, drop = FALSE]
   cond_ct <- droplevels(cond_ct[valid])
   
-  # Quick sanity check on samples per condition
+  # Validate sample counts by condition
   tab_cond <- table(cond_ct)
   if (length(tab_cond) < 2) {
     warning("Skipping ", st, ": <2 condition levels.")

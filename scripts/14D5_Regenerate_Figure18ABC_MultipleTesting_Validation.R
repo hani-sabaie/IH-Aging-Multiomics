@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7:
+# Figure 18A-C regeneration:
 # Regenerate Figure 18A-C candidate panels using the corrected full-18
 # CellChat networks (nboot=1000, plus-one empirical P, condition-wide BH).
 #
@@ -35,7 +35,7 @@ candidate_dir <- file.path(
   "12_CellChat",
   "multiple_testing_audit",
   "full18_nboot1000_BH",
-  "figure18ABC_corrected_candidate"
+  "figure18ABC_validation"
 )
 
 figdir <- file.path(
@@ -51,12 +51,12 @@ dir.create(
 
 young_file <- file.path(
   candidate_dir,
-  "cellchat_Young_full18_nboot1000_plus1BH_corrected_candidate.rds"
+  "cellchat_Young_full18_nboot1000_plus1BH_validation.rds"
 )
 
 aged_file <- file.path(
   candidate_dir,
-  "cellchat_Aged_full18_nboot1000_plus1BH_corrected_candidate.rds"
+  "cellchat_Aged_full18_nboot1000_plus1BH_validation.rds"
 )
 
 for (f in c(young_file, aged_file)) {
@@ -144,7 +144,7 @@ plot_circle_png(
   "Young - overall signaling",
   file.path(
     figdir,
-    "Figure18A_circle_overall_Young_corrected_candidate.png"
+    "Figure18A_circle_overall_Young_validation.png"
   )
 )
 
@@ -153,7 +153,7 @@ plot_circle_png(
   "Aged - overall signaling",
   file.path(
     figdir,
-    "Figure18A_circle_overall_Aged_corrected_candidate.png"
+    "Figure18A_circle_overall_Aged_validation.png"
   )
 )
 
@@ -195,7 +195,7 @@ p_scatter_combined <-
 ggsave(
   filename = file.path(
     figdir,
-    "Figure18B_signalingRole_scatter_Young_vs_Aged_corrected_candidate.png"
+    "Figure18B_signalingRole_scatter_Young_vs_Aged_validation.png"
   ),
   plot = p_scatter_combined,
   width = 10,
@@ -206,7 +206,7 @@ ggsave(
 ggsave(
   filename = file.path(
     figdir,
-    "Figure18B_signalingRole_scatter_Young_vs_Aged_corrected_candidate.pdf"
+    "Figure18B_signalingRole_scatter_Young_vs_Aged_validation.pdf"
   ),
   plot = p_scatter_combined,
   width = 10,
@@ -248,7 +248,7 @@ ht_in_aged <- netAnalysis_signalingRole_heatmap(
 png(
   file.path(
     figdir,
-    "Figure18C_incoming_netP_Young_vs_Aged_corrected_candidate.png"
+    "Figure18C_incoming_netP_Young_vs_Aged_validation.png"
   ),
   width = 3200,
   height = 1600,
@@ -265,7 +265,7 @@ dev.off()
 pdf(
   file.path(
     figdir,
-    "Figure18C_incoming_netP_Young_vs_Aged_corrected_candidate.pdf"
+    "Figure18C_incoming_netP_Young_vs_Aged_validation.pdf"
   ),
   width = 3200 / 300,
   height = 1600 / 300
@@ -298,7 +298,7 @@ ht_out_aged <- netAnalysis_signalingRole_heatmap(
 png(
   file.path(
     figdir,
-    "Figure18C_outgoing_netP_Young_vs_Aged_corrected_candidate.png"
+    "Figure18C_outgoing_netP_Young_vs_Aged_validation.png"
   ),
   width = 3200,
   height = 1600,
@@ -315,7 +315,7 @@ dev.off()
 pdf(
   file.path(
     figdir,
-    "Figure18C_outgoing_netP_Young_vs_Aged_corrected_candidate.pdf"
+    "Figure18C_outgoing_netP_Young_vs_Aged_validation.pdf"
   ),
   width = 3200 / 300,
   height = 1600 / 300

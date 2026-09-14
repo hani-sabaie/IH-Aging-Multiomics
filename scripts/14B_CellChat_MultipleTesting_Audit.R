@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 audit:
+# CellChat multiple-testing audit:
 # Multiple-testing assessment for CellChat communication probabilities
 # underlying Figure 18.
 #

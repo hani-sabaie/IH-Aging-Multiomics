@@ -170,7 +170,7 @@ options(future.globals.maxSize = 8 * 1024^3)
 
 # Each LR batch is evaluated sequentially. This avoids the large Windows
 # multisession overhead observed for the full LR family and reproduces the
-# reviewer-C7 validation runs exactly.
+# independent validation runs exactly.
 future::plan("sequential")
 obj$samples <- obj$sample
 obj$cc_group <- NA_character_
@@ -190,7 +190,7 @@ obj_young$group_cellchat <- obj_young$cc_group
 obj_aged$group_cellchat  <- obj_aged$cc_group
 
 # ============================================================================
-# CellChat communication inference with reviewer-C7 multiple-testing control
+# CellChat communication inference with multiple-testing control
 #
 # Primary inference:
 #   - triMean

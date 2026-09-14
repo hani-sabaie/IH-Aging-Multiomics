@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7
+# Canonical FinnGen replication validation
 # Validate targeted FinnGen replication directly from canonical resources.
 #
 # Discovery candidates:
@@ -182,7 +182,7 @@ setorder(
 )
 
 # --------------------------------------------------------------------------
-# Expected values from the independent C7 audit
+# Expected values from the independent validation
 # --------------------------------------------------------------------------
 smad3 <- rep[Gene == "SMAD3"]
 plekha6 <- rep[Gene == "PLEKHA6"]

@@ -1,11 +1,11 @@
 # ============================================================================
-# Reviewer C7 audit:
+# CellChat batch combination and BH correction:
 # Combine completed CellChat nboot=1000 batches and apply the final
 # condition-wide multiple-testing correction.
 #
 # Usage:
-#   Rscript scripts/14C7B_Combine_CellChat_Batches_BH.R Young
-#   Rscript scripts/14C7B_Combine_CellChat_Batches_BH.R Aged
+#   Rscript scripts/14D3_Combine_CellChat_Batches_BH.R Young
+#   Rscript scripts/14D3_Combine_CellChat_Batches_BH.R Aged
 #
 # Primary correction:
 #   plus-one empirical permutation P = (b + 1) / (B + 1)

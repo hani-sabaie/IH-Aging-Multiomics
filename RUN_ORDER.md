@@ -144,7 +144,7 @@ Principal combined output:
 
 - `processed_results/06_SMR_HEIDI/SMR_all_studies_all_tissues.csv`
 
-Apply the revised discovery/replication multiple-testing framework with:
+Apply the discovery/replication multiple-testing framework with:
 
 `scripts/06C_SMR_Discovery_Replication_Audit.R`
 
@@ -162,7 +162,7 @@ Benjamini-Hochberg correction across the two replication hypotheses:
 - `processed_results/06_SMR_HEIDI/targeted_FinnGen_replication.csv`
 
 HEIDI is retained as a heterogeneity diagnostic (`p_HEIDI > 0.01`) and is
-not a multiple-testing correction. The revised workflow does not use
+not a multiple-testing correction. The analysis workflow does not use
 nominal `p_SMR < 0.05` as a downstream significance criterion.
 
 ### 2.3 Integration of candidate-gene evidence

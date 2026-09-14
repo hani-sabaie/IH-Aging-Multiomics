@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7
+# Multiple-testing and integration audit
 # Human pseudobulk DE multiple-testing and integration audit
 #
 # No canonical files are overwritten.
@@ -271,7 +271,7 @@ module_sets <- list(
 )
 
 # -------------------------------------------------------------------------
-# Corrected UKB discovery set
+# BH-adjusted UKB discovery set
 # -------------------------------------------------------------------------
 
 ukb_sig <- ukb[

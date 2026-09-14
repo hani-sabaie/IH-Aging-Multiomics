@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 audit:
+# LinkPeaks downstream-filter validation:
 # Effect of multiple-testing correction for SMAD3 LinkPeaks on the downstream
 # high-confidence TF-gene-peak network.
 #

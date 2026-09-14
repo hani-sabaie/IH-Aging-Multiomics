@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 audit
+# CellChat nboot=1000 audit
 # CellChat rerun with increased permutation resolution.
 #
 # Historical analysis:
@@ -48,8 +48,7 @@ input_candidates <- c(
     repo_root,
     "outputs",
     "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
-  ),
-  "F:/Hani's Files/Hernia/outputs/decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"
+  )
 )
 
 input_hits <- input_candidates[file.exists(input_candidates)]

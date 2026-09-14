@@ -72,7 +72,7 @@ for (m in mods) {
 
 
 # ============================================================================
-# Revised FAP-DEG / hdWGCNA / UKB-SMR integration
+# FAP-DEG / hdWGCNA / UKB-SMR integration
 #
 # Discovery-stage SMR significance:
 #   - UKB only
@@ -125,7 +125,7 @@ DEGs_FAPs_genes <- sort(
 
 if (length(DEGs_FAPs_genes) != 194L) {
   stop(
-    "Expected 194 unique revised FAP DEG genes; found ",
+    "Expected 194 unique FAP DEG genes; found ",
     length(DEGs_FAPs_genes)
   )
 }
@@ -216,20 +216,20 @@ smr_ukb_bh_genes <- sort(
 
 if (nrow(ukb_discovery_rows) != 138L) {
   stop(
-    "Expected 138 corrected UKB discovery gene-tissue rows; found ",
+    "Expected 138 BH-adjusted UKB discovery gene-tissue rows; found ",
     nrow(ukb_discovery_rows)
   )
 }
 
 if (length(smr_ukb_bh_genes) != 84L) {
   stop(
-    "Expected 84 unique corrected UKB discovery genes; found ",
+    "Expected 84 unique BH-adjusted UKB discovery genes; found ",
     length(smr_ukb_bh_genes)
   )
 }
 
 # ---------------------------------------------------------------------------
-# Canonical corrected UKB discovery resources
+# Canonical BH-adjusted UKB discovery resources
 # ---------------------------------------------------------------------------
 smr_processed_dir <- file.path(
   repo_root,
@@ -284,7 +284,7 @@ brown_module_genes  <- get_module_genes("Brown")
 blue_module_genes   <- get_module_genes("Blue")
 
 # ---------------------------------------------------------------------------
-# Revised discovery-stage integration
+# Discovery-stage integration
 # ---------------------------------------------------------------------------
 module_sets <- list(
   Yellow = yellow_module_genes,
@@ -409,7 +409,7 @@ data.table::fwrite(
 )
 
 # ---------------------------------------------------------------------------
-# Revised UpSet
+# UpSet plot
 # ---------------------------------------------------------------------------
 x <- list(
   Yellow_Module = yellow_module_genes,
@@ -497,7 +497,7 @@ data.table::fwrite(
 # Console summary
 # ---------------------------------------------------------------------------
 cat("\n============================================================\n")
-cat("REVISED DISCOVERY-STAGE INTEGRATION\n")
+cat("DISCOVERY-STAGE INTEGRATION\n")
 cat("============================================================\n\n")
 
 cat("Yellow-module genes:", length(yellow_module_genes), "\n")

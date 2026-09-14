@@ -1,11 +1,11 @@
 # ============================================================================
-# Reviewer C7 audit:
+# Full 18-pathway CellChat multiple-testing audit:
 # Full 18-pathway CellChat rerun with improved permutation resolution and
 # family-wide multiple-testing correction.
 #
 # Usage:
-#   Rscript 14C7_CellChat_Full18_nboot1000_BH_Audit.R Young
-#   Rscript 14C7_CellChat_Full18_nboot1000_BH_Audit.R Aged
+#   Rscript 14D1_CellChat_Full18_nboot1000_BH_Audit.R Young
+#   Rscript 14D1_CellChat_Full18_nboot1000_BH_Audit.R Aged
 #
 # Framework:
 #   - use the canonical historical merged CellChat object
@@ -84,7 +84,7 @@ if (!file.exists(hist_file)) {
 }
 
 cat("============================================================\n")
-cat("FULL 18-PATHWAY CELLCHAT C7 AUDIT\n")
+cat("FULL 18-PATHWAY CELLCHAT MULTIPLE-TESTING AUDIT\n")
 cat("============================================================\n\n")
 
 cat("Condition :", ds, "\n")

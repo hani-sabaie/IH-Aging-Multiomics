@@ -176,7 +176,7 @@ if (
   )
 }
 
-# Remove temporary keys before writing production files.
+# Remove intermediate keys before writing production files.
 all_new[, key := NULL]
 primary[, key := NULL]
 sensitivity[, key := NULL]
@@ -199,7 +199,7 @@ if (any(smad3$p_val_adj < 0.05)) {
   )
 }
 
-# Explicitly validate the manuscript-relevant EP/Veh values.
+# Explicitly validate the key reported EP/Veh values.
 type2a <- smad3[
   celltype == "Type IIa Myofiber" &
     contrast == "Veh_vs_EP"

@@ -631,8 +631,8 @@ fig18f[
   figure_panel := "Figure18F"
 ]
 
-# Add the communication probability and the revised inferential P value
-# directly from @net. In the revised canonical CellChat object, @net$pval
+# Add the communication probability and the inferential P value
+# directly from @net. In the canonical CellChat object, @net$pval
 # stores plus-one empirical P values after condition-wide BH correction.
 fig18f[
   ,

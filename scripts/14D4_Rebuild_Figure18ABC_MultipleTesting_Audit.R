@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 audit:
+# Figure 18A-C reconstruction audit:
 # Rebuild corrected full-18 CellChat networks from the completed
 # condition-wide nboot=1000 + plus-one + BH results, then quantify effects
 # on Figure 18A-C source data.
@@ -44,7 +44,7 @@ audit_root <- file.path(
 
 outdir <- file.path(
   audit_root,
-  "figure18ABC_corrected_candidate"
+  "figure18ABC_validation"
 )
 
 dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
@@ -468,7 +468,7 @@ saveRDS(
   young_result$object,
   file.path(
     outdir,
-    "cellchat_Young_full18_nboot1000_plus1BH_corrected_candidate.rds"
+    "cellchat_Young_full18_nboot1000_plus1BH_validation.rds"
   )
 )
 
@@ -476,7 +476,7 @@ saveRDS(
   aged_result$object,
   file.path(
     outdir,
-    "cellchat_Aged_full18_nboot1000_plus1BH_corrected_candidate.rds"
+    "cellchat_Aged_full18_nboot1000_plus1BH_validation.rds"
   )
 )
 
@@ -484,7 +484,7 @@ saveRDS(
   corrected_merged,
   file.path(
     outdir,
-    "cellchat_merged_full18_nboot1000_plus1BH_corrected_candidate.rds"
+    "cellchat_merged_full18_nboot1000_plus1BH_validation.rds"
   )
 )
 
@@ -1038,7 +1038,7 @@ fwrite(
   corr_A,
   file.path(
     outdir,
-    "Figure18A_corrected_candidate_source_data.csv"
+    "Figure18A_validation_source_data.csv"
   )
 )
 
@@ -1046,7 +1046,7 @@ fwrite(
   corr_B,
   file.path(
     outdir,
-    "Figure18B_corrected_candidate_source_data.csv"
+    "Figure18B_validation_source_data.csv"
   )
 )
 
@@ -1054,7 +1054,7 @@ fwrite(
   corr_C,
   file.path(
     outdir,
-    "Figure18C_corrected_candidate_source_data.csv"
+    "Figure18C_validation_source_data.csv"
   )
 )
 

@@ -746,12 +746,10 @@ obj <- FindVariableFeatures(obj, selection.method = "vst",
                             nfeatures = 2000)
 
 # ===== Scaling the data =====
-# all_genes <- rownames(x = obj)
-# obj <- ScaleData(object = obj, features = all_genes)
 obj <- ScaleData(obj)
 
 # ========================
-# Scaling and regression of sources of unwanted variation
+# Scaling and assessment of cell-cycle variation
 # ========================
 # ===== Cell Cycle Scoring =====
 s_genes <- cc.genes$s.genes
@@ -786,21 +784,8 @@ obj <- RunPCA(obj)
 
 # ===== Visualize the PCA, grouping by cell cycle phase =====
 save_gg(DimPlot(obj, reduction = "pca", group.by = "Phase"), 
-        "PCA_cell_cycle_before_regress.png", w=8, h=5)
+        "PCA_cell_cycle.png", w=8, h=5)
 
-# ===== Apply regression variables =====
-# Define variables in metadata to regress
-# vars_to_regress <- c("S.Score", "G2M.Score")
-
-# Regress out the uninteresting sources of variation in the data
-# obj <- ScaleData(object = obj,
-                 # vars.to.regress = vars_to_regress, 
-                 # verbose = FALSE)
-
-# Re-run the PCA
-# obj <- RunPCA(obj)
-# save_gg(DimPlot(obj, reduction = "pca", group.by = "Phase"), 
-        # "PCA_cell_cycle_after_regress.png", w=8, h=5)
 
 # ========================
 # Save the metadata
@@ -961,7 +946,7 @@ save_gg(
   ElbowPlot(obj, reduction = "lsi", ndims = 40),
   "ElbowPlot_LSI_1_to_40.png", w = 8, h = 5)
 
-# Depth correlation (ATAC-specific sanity check)
+# Depth correlation validation (ATAC-specific)
 # LSI_1 is often highly correlated with library size; if so, skip it.
 dc <- DepthCor(obj, reduction = "lsi")  # correlation of LSI components with depth (nCount_ATAC)
 save_gg(dc, "DepthCor_LSI.png", w = 8, h = 5)
@@ -1010,7 +995,7 @@ obj <- RunHarmony(
 pcs <- 40
 pcs_lsi <- 40
 
-# Candidate k values (simple & practical)
+# Candidate k values
 k.candidates <- sort(unique(c(20, 30, 40, 50, 60, 70, 80, 90, 100)))
 
 # Silhouette on a subsample to avoid O(N^2)
@@ -1223,9 +1208,6 @@ table(obj$sample)
 obj <- PrepSCTFindMarkers(obj, verbose=T)
 
 # Define identity
-# Idents(obj) <- "wsnn_res.0.8"
-# lev_num <- sort(as.integer(levels(Idents(obj))))
-# Idents(obj) <- factor(Idents(obj), levels = as.character(lev_num))
 
 Idents(obj) <- "skeletal_muscle"
 Idents(obj) <- factor(Idents(obj),
@@ -1256,19 +1238,6 @@ top <- obj_markers %>%
   ungroup() 
 save_gg(DoHeatmap(obj, features = top$gene) + NoLegend(),
         "Heatmap_top_10_markers.png", w=15, h=15)
-
-# Top 5 potential marker genes per cluster
-# top5PerCluster <- matrix(ncol=7)
-# colnames(top5PerCluster) = colnames(obj_markers)
-# for (i in obj_markers$cluster){
-#   top5PerCluster = rbind(top5PerCluster, head(obj_markers[which(obj_markers$cluster==i),], 5))
-# }
-# top5PerCluster <- top5PerCluster[-1,]
-# top5PerCluster
-
-# Heatmap of top 5 potential marker per cluster
-# save_gg(DoHeatmap(obj,features = top5PerCluster$gene, slot="scale.data"),
-#        "Heatmap_top5_per_cluster.png", w=15, h=12) #  In order to ensure that all genes are represented, the data slot can be directly called as the data reference, but it will not be z-scaled.
 
 # Compare marker expression across clusters
 mk <- c("MYLPF","TNNC2","ACTA1","CKM","TTN",
@@ -1306,16 +1275,6 @@ save_gg(FeaturePlot(obj,features = mkf, reduction = "wnn.umap",ncol = 4),
         "FeaturePlot_markers_clust.png", w=15, h=12)
 save_gg(DotPlot(obj, features= unique(mk),dot.scale = 9,dot.min = 0.25, col.min = 0,col.max = 2),
         "DotPlot_markers_clust.png", w=49, h=12)
-
-# =====  Cell annotation by differential expressed gene markers =====
-# Idents(obj) <- "wsnn_res.0.8"
-# avgExp <- AverageExpression(obj, assay="SCT", 
-#                             features = c()$SCT
-# avgExp
-# save_gg(DimPlot(obj,label=T),
-#         "Umap_annotation.png", w=8, h=5)
-# save_gg(FeaturePlot(obj, features=c(FAP1, FAP2, FAP3, FAP4), ncol=3, order=T, reduction = "wnn.umap"),
-#         "FeaturePlot_annotation_markers.png", w=8, h=5)
 
 # =====  Assign cell identities =====
 skeletal_muscle <- vector(length=ncol(obj))
@@ -1403,7 +1362,6 @@ saveRDS(obj,file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_inte
 # Load the object
 # ========================
 obj <- readRDS(file.path(outdir, "decont_merged_filt_nodoub_cc_sct_reduc_clust_integ_annot_obj.rds"))
-# obj <- obj %>% subset(cell_type == 'FAPs')
 
 # ========================
 # Differential expression analysis

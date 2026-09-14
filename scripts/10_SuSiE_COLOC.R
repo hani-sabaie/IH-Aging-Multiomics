@@ -77,7 +77,6 @@ colnames(ld_matrix) <- bim2$rsID
 # Remove SNPs with invalid diagonal entries
 diag_vals <- diag(ld_matrix)
 bad_snps <- names(diag_vals)[diag_vals <= 0 | is.na(diag_vals)]
-# bad_snps <- c(bad_snps, "rs141195834")
 
 good_snps <- setdiff(rownames(ld_matrix), bad_snps)
 
@@ -131,7 +130,7 @@ ld_pd <- as.matrix(nearPD(ld_matrix_final, corr = TRUE)$mat)
 merged_final <- merged[merged$rsID %in% final_snps, ]
 merged_final <- merged_final[match(final_snps, merged_final$rsID), ]
 
-# Sanity checks
+# Validation checks
 stopifnot(all(rownames(ld_pd) == final_snps))
 stopifnot(all(merged_final$rsID == final_snps))
 
@@ -209,7 +208,7 @@ gwas_sub <- gwas_sub[match(common_snps, gwas_sub$SNP), ]
 eqtl_sub <- eqtl[eqtl$SNP %in% common_snps, ]
 eqtl_sub <- eqtl_sub[match(common_snps, eqtl_sub$SNP), ]
 
-# Sanity checks on alignment
+# Alignment validation checks
 stopifnot(all(rownames(R_common) == common_snps))
 stopifnot(all(gwas_sub$SNP  == common_snps))
 stopifnot(all(eqtl_sub$SNP  == common_snps))

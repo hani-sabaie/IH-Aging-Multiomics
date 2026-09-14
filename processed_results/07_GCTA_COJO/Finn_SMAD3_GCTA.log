@@ -1,0 +1,44 @@
+Repository note: local paths, hostname, and wall-clock timestamps were omitted; GCTA output messages and numerical results are otherwise unchanged.
+
+*******************************************************************
+* Genome-wide Complex Trait Analysis (GCTA)
+* version v1.95.0 Windows
+* (C) 2010-present, Yang Lab, Westlake University
+* Please report bugs to Jian Yang <jian.yang@westlake.edu.cn>
+*******************************************************************
+
+Accepted options:
+--bfile REFERENCE_DATA/Finn_SMAD3_1000G_EUR
+--cojo-file GWAS_INPUT/Finn_SMAD3_for_GCTA.tsv
+--cojo-slct
+--cojo-p 5e-05
+--out processed_results/07_GCTA_COJO/Finn_SMAD3_GCTA
+
+
+Reading PLINK FAM file from [REFERENCE_DATA/Finn_SMAD3_1000G_EUR.fam].
+503 individuals to be included from [REFERENCE_DATA/Finn_SMAD3_1000G_EUR.fam].
+Reading PLINK BIM file from [REFERENCE_DATA/Finn_SMAD3_1000G_EUR.bim].
+2724 SNPs to be included from [REFERENCE_DATA/Finn_SMAD3_1000G_EUR.bim].
+Warning: Duplicated SNP ID "rs145272336" has been changed to "rs145272336_245"
+.Reading PLINK BED file from [REFERENCE_DATA/Finn_SMAD3_1000G_EUR.bed] in SNP-major format ...
+Genotype data for 503 individuals and 2724 SNPs to be included from [REFERENCE_DATA/Finn_SMAD3_1000G_EUR.bed].
+
+Reading GWAS summary-level statistics from [GWAS_INPUT/Finn_SMAD3_for_GCTA.tsv] ...
+GWAS summary statistics of 3376 SNPs read from [GWAS_INPUT/Finn_SMAD3_for_GCTA.tsv].
+Phenotypic variance estimated from summary statistics of all 3376 SNPs: 16.882 (variance of logit for case-control studies).
+Matching the GWAS meta-analysis results to the genotype data ...
+Calculating allele frequencies ...
+Warning: can't match the reference alleles of 14 SNPs to those in the genotype data. These SNPs have been saved in [processed_results/07_GCTA_COJO/Finn_SMAD3_GCTA.badsnps].
+2714 SNPs are matched to the genotype data.
+Calculating the variance of SNP genotypes ...
+
+Performing stepwise model selection on 2714 SNPs to select association signals ... (p cutoff = 5e-05; collinearity cutoff = 0.9)
+(Assuming complete linkage equilibrium between SNPs which are more than 10Mb away from each other)
+Finally, 2 associated SNPs are selected.
+Performing joint analysis on all the 2 selected signals ...
+Saving the 2 independent signals to [processed_results/07_GCTA_COJO/Finn_SMAD3_GCTA.jma.cojo] ...
+Saving the LD structure of 2 independent signals to [processed_results/07_GCTA_COJO/Finn_SMAD3_GCTA.ldr.cojo] ...
+Saving the conditional analysis results of 2712 remaining SNPs to [processed_results/07_GCTA_COJO/Finn_SMAD3_GCTA.cma.cojo] ...
+(0 SNPs eliminated by backward selection and 0 SNPs filtered by collinearity test are not included in the output)
+
+Overall computational time: 0.13 sec.

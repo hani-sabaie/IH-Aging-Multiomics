@@ -1,7 +1,7 @@
 # ===== SMAD3 LinkPeaks multiple-testing audit =====
 #
 # Purpose:
-#   Audit the reported SMAD3 peak-to-gene linkage for reviewer C7 without
+#   Audit the reported SMAD3 peak-to-gene linkage without
 #   rerunning the stochastic LinkPeaks background-sampling procedure.
 #
 # Strategy:
@@ -16,7 +16,7 @@
 #   5) Also calculate an intentionally ultra-conservative correction across
 #      every ATAC peak in the object.
 #
-# No canonical analysis object or manuscript file is modified.
+# No canonical analysis object is modified.
 
 rm(list = ls(all.names = TRUE))
 gc()
@@ -43,19 +43,12 @@ if (length(file_arg) == 1) {
   repo_root <- normalizePath(".")
 }
 
-# Resolve large intermediate RDS files.
-#
-# Prefer repository-local outputs when available. For the original analysis,
-# the large intermediate objects were retained on the original F: drive and
-# were not copied into the reproducibility repository.
-
-original_outputs_dir <- "F:/Hani's Files/Hernia/outputs"
+# Resolve large intermediate RDS files from repository outputs.
 
 resolve_rds <- function(filename) {
 
   candidates <- c(
-    file.path(repo_root, "outputs", filename),
-    file.path(original_outputs_dir, filename)
+    file.path(repo_root, "outputs", filename)
   )
 
   hit <- candidates[file.exists(candidates)]
@@ -326,7 +319,7 @@ bonf_cis <- min(
 )
 
 # Deliberately extreme sensitivity analysis:
-# pretend every peak in the entire ATAC assay belonged to the test family.
+# Conservative sensitivity scenario: treat every ATAC peak as part of the test family.
 bonf_all_atac <- min(
   raw_p * n_all_atac_peaks,
   1

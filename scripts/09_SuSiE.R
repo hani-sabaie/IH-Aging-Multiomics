@@ -77,7 +77,6 @@ diag_vals <- diag(ld_matrix)
 
 # SNPs with zero or negative diagonal entries are invalid
 bad_snps <- names(diag_vals)[diag_vals <= 0 | is.na(diag_vals)]
-# bad_snps <- c(bad_snps, "rs141195834")
 
 # Keep only good SNPs
 good_snps <- setdiff(rownames(ld_matrix), bad_snps)
@@ -152,7 +151,7 @@ png(filename = "Finn_marg_asso.png", width = 3000, height = 1500, res = 300)
 plot_z_with_highlight(z_raw, snp_ids = merged$rsID, highlight_snps = flip_snps)
 dev.off()
 
-# Now actually flip beta and freq for flipped SNPs
+# Flip beta and allele frequency for identified flipped SNPs
 merged$beta_aligned[flip_idx] <- -merged$beta_aligned[flip_idx]
 merged$freq_aligned[flip_idx] <- 1 - merged$freq_aligned[flip_idx]
 
@@ -194,7 +193,7 @@ summary(eig_vals_pd)
 merged_final <- merged[merged$rsID %in% final_snps, ]
 merged_final <- merged_final[match(final_snps, merged_final$rsID), ]
 
-# Sanity checks
+# Validation checks
 stopifnot(all(rownames(ld_pd) == final_snps))
 stopifnot(all(merged_final$rsID == final_snps))
 
@@ -212,15 +211,6 @@ png(filename = "Finn_cndzplot.png", width = 3000, height = 1500, res = 300)
 print(condz$plot)   # condz$plot is a ggplot object
 dev.off()
 
-# z_obs <- condz[["conditional_dist"]][["z"]]
-# z_exp <- condz[["conditional_dist"]][["condmean"]]
-# diff_val <- abs(z_obs - z_exp)
-# bad_idx <- which(diff_val > 2.5) # 3 or 2.5
-# bad_idx
-# snp_names <- rownames(ld_pd)
-# bad_snps_condz <- snp_names[bad_idx]
-# bad_snps_condz
-# Add to bad_snps and run again
 
 # Keep only those SNPs in LD as well
 keep_snps <- merged_final$rsID
@@ -231,7 +221,7 @@ R <- ld_pd[keep_snps, keep_snps]
 # Reorder merged_final to match R ordering (for safety)
 merged_final <- merged_final[match(keep_snps, merged_final$rsID), ]
 
-# Sanity checks
+# Validation checks
 stopifnot(all(rownames(R) == merged_final$rsID))
 
 # ===== Build z, beta, varbeta and dataset1 for coloc/SuSiE =====
@@ -258,7 +248,7 @@ dataset1 <- list(
   N = ntotal
 )
 
-# Sanity check (coloc)
+# Colocalization validation check
 coloc:::check_dataset(dataset1, 1)
 
 # ===== Run SuSiE with LD via coloc::runsusie =====

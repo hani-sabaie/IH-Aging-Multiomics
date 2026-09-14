@@ -149,7 +149,7 @@ if ($PreflightOnly) {
             --ld-lower-limit 0.05 `
             --heidi-min-m 3 `
             --heidi-max-m 20 `
-            --cis-wind 1000000 `
+            --cis-wind 1000 `
             --thread-num 5 `
             --diff-freq-prop 0.05 `
             --out $outPrefix

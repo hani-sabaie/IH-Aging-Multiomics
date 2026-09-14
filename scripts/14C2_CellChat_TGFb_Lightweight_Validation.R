@@ -1,5 +1,5 @@
 # ============================================================================
-# Reviewer C7 audit
+# CellChat TGF-beta lightweight validation
 # Lightweight reconstruction of historical TGFb CellChat probabilities.
 #
 # Purpose:

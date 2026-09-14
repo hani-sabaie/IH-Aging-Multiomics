@@ -1,8 +1,8 @@
 # ============================================================================
-# Reviewer C7 pre-production validation
+# Pre-production validation of canonical SMR integration
 #
 # Validate that the canonical combined SMR resource reproduces the corrected
-# UKB discovery set and revised FAP/module integration.
+# UKB discovery set and FAP/module integration.
 #
 # No canonical result or figure is modified.
 # ============================================================================
@@ -56,8 +56,8 @@ audit_file <- file.path(
   "processed_results",
   "06_SMR_HEIDI",
   "multiple_testing_audit",
-  "figure10_revised_candidate",
-  "Figure10A_UKB_corrected_discovery_rows.tsv"
+  "figure10_validation",
+  "Figure10A_UKB_BH_adjusted_discovery_rows.tsv"
 )
 
 for (f in c(
@@ -259,7 +259,7 @@ max_delta_heidi <- max(
 )
 
 # --------------------------------------------------------------------------
-# Revised FAP/module integration
+# FAP/module integration
 # --------------------------------------------------------------------------
 deg_genes <- sort(
   unique(
